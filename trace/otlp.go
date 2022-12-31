@@ -17,7 +17,7 @@ func newID() []byte {
 }
 
 
-func otlp_generateSampleTrace() *trace_v1.Span {
+func GetOtlpTrace() *trace_v1.Span {
 	now := uint64(time.Now().UnixNano())
 	rand.Seed(int64(now))
 

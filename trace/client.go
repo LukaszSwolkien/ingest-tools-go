@@ -1,11 +1,13 @@
 package trace
 
 import (
+	"fmt"
 	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httputil"
+	trace_v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 func PostTraceSample(url string, secret string, contentType string, trace ZipkinTrace) {
@@ -36,4 +38,10 @@ func PostTraceSample(url string, secret string, contentType string, trace Zipkin
 		log.Fatalln(err)
 	}
 	log.Println(string(dr))
+}
+
+func GRPCTraceSample(url string, secret string, port int, data *trace_v1.Span) {
+	log.Printf("Seting up a gRPC connection to %s:%s...", url, fmt.Sprint(port))
+	err := "not implemented"
+	log.Fatalf("did not connect: %v", err)
 }
