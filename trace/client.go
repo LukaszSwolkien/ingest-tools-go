@@ -25,8 +25,7 @@ func PostZipkinTraceSample(url string, secret string, trace ZipkinTrace) {
 	if err != nil {
 		log.Fatalf("Marshal: %v", err)
 	}
-	log.Println("* Ingest endpoint: " + url)
-	log.Println("* Sending sample data:\n" + string(json_data))
+	log.Println("Sending sample data:\n" + string(json_data))
 
 	r, err := http.NewRequest("POST", url, bytes.NewBuffer(json_data))
 	r.Header.Add("Content-Type", contentType)
@@ -59,8 +58,8 @@ func GrpcOtlpTraceSample(url string, secret string, dial_option bool, data  *tra
 	} else {
 		sec = grpc.WithTransportCredentials(insecure.NewCredentials())
 	}
-
-	log.Printf("Setting up %s gRPC connection to %v", security_option, fmt.Sprint(url))
+	log.Printf("Security option: %v", security_option)
+	log.Printf("Setting up a gRPC connection to %v", fmt.Sprint(url))
 	conn, err := grpc.Dial(url, sec, grpc.WithBlock())
 	if err != nil {
 		log.Printf("Failed to connect to gRPC server: %v", err)

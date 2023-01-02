@@ -18,7 +18,5 @@ TODO: add missing examples for all ingest endpoints
 
 ```yaml
 splunk-ingest-token: "your_access_token"
-splunk-api-token: "your_access_token"
 splunk-ingest: "https://ingest.{realm}.signalfx.com"
-splunk-api: "https://api.{realm}.signalfx.com/v2/integration"
 ```
