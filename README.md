@@ -5,7 +5,7 @@ Sample Golang tools to ingest telemetry data into Splunk Observability suite
 Create your organisation using Splunk API (see [here](https://github.com/LukaszSwolkien/ingest-tools)), and setup access tokens.
 
 ```bash
-go run ./main.go
+go run ./main.go -token=my_token -ingest=https://ingest.REALM.signalfx.com -endpoint=v2/trace
 ```
 
 TODO: add missing examples for all ingest endpoints
