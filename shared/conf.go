@@ -19,7 +19,7 @@ type Conf struct {
 func (c *Conf) LoadConf(confFile string) (error) {
 	yamlFile, err := os.ReadFile(confFile)
 	if err != nil {
-		log.Printf("cannot read secrets, err to %v", err)
+		log.Printf("cannot read configuration, err to %v", err)
 		return err
 	}
 	err = yaml.Unmarshal(yamlFile, c)

@@ -21,7 +21,7 @@ var (
 
 func loadConfiguration(){
 	var c shared.Conf
-	err := c.LoadConf(".secrets.yaml")
+	err := c.LoadConf(".conf.yaml")
 	if err == nil {
 		if *ingest == "" {
 			*ingest = c.Ingest

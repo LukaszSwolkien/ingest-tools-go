@@ -16,3 +16,4 @@
 
 .vscode/
 .secrets.yaml
+.conf.yaml
