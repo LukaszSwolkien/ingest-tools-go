@@ -8,45 +8,60 @@ import (
 )
 
 var (
-	endpoint = flag.String("endpoint", "v2/trace", 
-	"The ingest type (v1/log, v2/trace, v2/trace/otlp, v2/datapoint, v2/datapoint/otlp)")
-	content_type = flag.String("content-type", "application/json", "Content-Type (application/json, x-thrift, x-protobuf)")
+	ingest = flag.String("ingest", "", "ingest url")
+	endpoint = flag.String("endpoint", "", "The ingest type (v1/log, v2/trace, v2/trace/otlp, v2/datapoint, v2/datapoint/otlp)")
+	token = flag.String("token", "", "Ingest access token")
 	protocol = flag.String("protocol", "zipkin", "The request protocol (zipkin, otlp, sapm, thrift)")
-	transport = flag.String("transport", "grpc", "Transport (http, grpc)")
-	dial_option = flag.Bool("dial-option", false, "Set dial-option=true to enable TLS")
-	token = flag.String("ingest-token", "", "Ingest access token")
+	grpcInsecure = flag.Bool("grpc-insecure", false, "Set grpc-insecure=false to enable TLS")
+	// transport = flag.String("transport", "grpc", "Transport (http, grpc)")
+	ingest_url = ""
+
 )
 
 
+func loadConfiguration(){
+	var c shared.Conf
+	err := c.LoadConf(".secrets.yaml")
+	if err == nil {
+		if *ingest == "" {
+			*ingest = c.Ingest
+		}
+		if *token == "" {
+			*token = c.Token
+		}
+		if *endpoint == "" {
+			*endpoint = c.Endpoint
+		}
+		if *protocol == "" {
+			*protocol = c.Protocol
+		}
+	}
+	ingest_url = *ingest + "/" + *endpoint
+}
+
 func main() {
 	flag.Parse()
-	// log.Println(*it, *ct, *body)
-	var c shared.Conf
-	c.LoadConf(".secrets.yaml")
-	ingest_url := c.IngestEndpoint + "/" + *endpoint
-	access_token := *token
-	if access_token == "" {
-		access_token = c.IngestToken
-	}
+	loadConfiguration()
 	log.Printf("Ingest endpoint: %v", ingest_url)
 	switch *endpoint {
 		case "v2/trace":
-			if (*content_type == "application/json" || *protocol == "zipkin"){
-				log.Printf("Zipkin JSON format")
+			if (*protocol == "zipkin"){
+				content_type := "application/json"
+				log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
 				var json_data = trace.GenerateZipkinSample()
-				trace.PostZipkinTraceSample(ingest_url, access_token, json_data)
-			} else if (*content_type == "x-thrift" || *protocol == "thrift") {
-				log.Fatalln("Jaeger Thrift format not implemented")
-			} else if (*content_type == "x-protobuf" || *protocol == "sapm") {
-				log.Fatalln("SAPM format not implemented")
+				trace.PostZipkinTraceSample(ingest_url, *token, json_data)
+			} else if (*protocol == "thrift") {
+				content_type := "x-thrift"
+				log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)
+			} else if (*protocol == "sapm") {
+				content_type := "x-protobuf"
+				log.Fatalf("SAPM format not implemented, Content-Type: %v", content_type)
 			}
 		case "v2/trace/otlp":
 			log.Printf("Protocol: otlp")
-			log.Printf("Transport: %v", *transport)
-			var otlp_data = trace.GetOtlpTrace()
-			if *transport == "grpc" {
-				trace.GrpcOtlpTraceSample(ingest_url, access_token, *dial_option, otlp_data)
-	}
+			log.Printf("Transport: grpc")
+			otlp_data := trace.GetOtlpTrace()
+			trace.GrpcOtlpTraceSample(ingest_url, *token, *grpcInsecure, otlp_data)
 	default:
 		log.Fatalln("Unsupported endpoint")
 	}

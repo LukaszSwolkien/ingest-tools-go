@@ -49,14 +49,14 @@ func PostZipkinTraceSample(url string, secret string, trace ZipkinTrace) {
 	log.Println(string(dr))
 }
 
-func GrpcOtlpTraceSample(url string, secret string, dial_option bool, data  *trace_ingest.ExportTraceServiceRequest) {
+func GrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, data  *trace_ingest.ExportTraceServiceRequest) {
 	var sec grpc.DialOption
 	security_option := "insecure"
-	if dial_option {
+	if grpcInsecure {
+		sec = grpc.WithTransportCredentials(insecure.NewCredentials())
+	} else {
 		sec = grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{}))
 		security_option = "TLS"
-	} else {
-		sec = grpc.WithTransportCredentials(insecure.NewCredentials())
 	}
 	log.Printf("Security option: %v", security_option)
 	log.Printf("Setting up a gRPC connection to %v", fmt.Sprint(url))
@@ -67,7 +67,7 @@ func GrpcOtlpTraceSample(url string, secret string, dial_option bool, data  *tra
 	}
 	log.Printf("Connection successful %v", conn)
 
-	auth := &sfx_grpc_auth.SignalFxTokenAuth{Token: secret, DisableTransportSecurity: dial_option}
+	auth := &sfx_grpc_auth.SignalFxTokenAuth{Token: secret, DisableTransportSecurity: grpcInsecure}
 
 	ingest_cli := trace_ingest.NewTraceServiceClient(conn)
 	rs, err := ingest_cli.Export(context.Background(), data, grpc.PerRPCCredentials(auth))
