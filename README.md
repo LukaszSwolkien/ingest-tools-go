@@ -11,7 +11,7 @@ go run ./main.go -token=my_token -ingest=https://ingest.REALM.signalfx.com -endp
 TODO: add missing examples for all ingest endpoints
 
 # Setup project 
-### You can create `.secrets.yaml` file with ingest url, token, endpoint etc defined instead of using command line args, for example:
+You can create `.secrets.yaml` file with ingest url, token, endpoint etc defined instead of using command line args, for example:
 
 ```yaml
 token: "YOUR_ACCESS_TOKEN"
