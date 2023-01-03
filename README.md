@@ -2,16 +2,16 @@
 Sample Golang tools to ingest telemetry data into Splunk Observability suite
 
 ## Usage examples:
-Create your organisation using Splunk API (see [here](https://github.com/LukaszSwolkien/ingest-tools)), and setup access tokens.
+Create your organisation using Splunk API, and setup access tokens (see [here](https://github.com/LukaszSwolkien/ingest-tools)).
+
+To test OTLP format over gRPC:
+```bash
+go run main.go --token=my_token --endpoint=v2/trace/otlp --ingest=ingest.lab0.signalfx.com:443
+```
 
 To test Zipkin Json format:
 ```bash
 go run ./main.go --token=my_token --ingest=https://ingest.REALM.signalfx.com --endpoint=v2/trace
-```
-
-To test OTLP format over gRPC transport:
-```bash
-go run main.go --token=my_token --endpoint=v2/trace/otlp --ingest=ingest.lab0.signalfx.com:443
 ```
 
 # Setup project 
