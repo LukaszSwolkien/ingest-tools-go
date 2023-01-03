@@ -61,7 +61,7 @@ func main() {
 			log.Printf("Protocol: otlp")
 			log.Printf("Transport: grpc")
 			otlp_data := trace.GenerateOtlpTrace()
-			trace.SendGrpcOtlpTraceSample(ingest_url, *token, *grpcInsecure, otlp_data)
+			trace.SendGrpcOtlpTraceSample(*ingest, *token, *grpcInsecure, otlp_data)
 	default:
 		log.Fatalln("Unsupported endpoint")
 	}

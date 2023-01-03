@@ -90,6 +90,7 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resou
 	data := &colTrace.ExportTraceServiceRequest{ResourceSpans: resourceSpans}
 	security_option := "insecure"
 	var sec grpc.DialOption
+	log.Printf("insecure %v", grpcInsecure)
 	if grpcInsecure {
 		sec = grpc.WithTransportCredentials(insecure.NewCredentials())
 	} else {
@@ -98,18 +99,19 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resou
 	}
 	log.Printf("Security option: %v", security_option)
 	log.Printf("Setting up a gRPC connection to %v", url)
-	conn, err := grpc.Dial(url, sec, grpc.WithBlock())
+	conn, err := grpc.Dial(url, sec)//, grpc.WithBlock())
 	if err != nil {
-		log.Fatalf("Failed to connect to gRPC server: %v", err)
+		log.Fatalf("Did not connect: %v", err)
 	}
-	log.Printf("Connection successful %v", conn)
-
+	defer conn.Close()
 	auth := &grpcSfxAuth.SignalFxTokenAuth{Token: secret, DisableTransportSecurity: grpcInsecure}
+	c := colTrace.NewTraceServiceClient(conn)
 
-	ingest_cli := colTrace.NewTraceServiceClient(conn)
-	rs, err := ingest_cli.Export(context.Background(), data, grpc.PerRPCCredentials(auth))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	rs, err := c.Export(ctx, data, grpc.PerRPCCredentials(auth))
 	if err != nil {
-		log.Fatalf("Failed to call gRPC Export methond: %v", err)
+		log.Fatalf("Err in TraseServiceServer.Export methond: %v", err)
 	}
 	log.Printf("resoponse %v", rs.String())
 }
