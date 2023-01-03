@@ -99,7 +99,7 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resou
 	}
 	log.Printf("Security option: %v", security_option)
 	log.Printf("Setting up a gRPC connection to %v", url)
-	conn, err := grpc.Dial(url, sec)//, grpc.WithBlock())
+	conn, err := grpc.Dial(url, sec, grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("Did not connect: %v", err)
 	}
@@ -111,7 +111,13 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resou
 	defer cancel()
 	rs, err := c.Export(ctx, data, grpc.PerRPCCredentials(auth))
 	if err != nil {
-		log.Fatalf("Err in TraseServiceServer.Export methond: %v", err)
+		log.Fatalf("Server error: %v", err)
 	}
-	log.Printf("resoponse %v", rs.String())
+	rejectSpand := rs.GetPartialSuccess()
+	if rejectSpand != nil {
+		log.Printf("Rejected spans %v", rejectSpand.ErrorMessage)
+
+	} else {
+		log.Printf("Request fully accepted")
+	}
 }
