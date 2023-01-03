@@ -11,7 +11,7 @@ go run main.go --token=my_token --ingest=ingest.REALM.signalfx.com:443 --endpoin
 
 To test Zipkin Json format:
 ```bash
-go run ./main.go --token=my_token --ingest=https://ingest.REALM.signalfx.com --endpoint=v2/trace
+go run main.go --token=my_token --ingest=https://ingest.REALM.signalfx.com --endpoint=v2/trace
 ```
 
 # Setup project 
