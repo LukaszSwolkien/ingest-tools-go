@@ -1,105 +1,115 @@
-// sample golang generator for trace ingest data in OTLP format
+// The sample OTLP generator for trace ingest data
 package trace
 
 import (
+	"log"
 	"math/rand"
-	"math/big"
 	"time"
+	"context"
+	"crypto/tls"
 	
-	common_v1 "go.opentelemetry.io/proto/otlp/common/v1"
-	trace_v1 "go.opentelemetry.io/proto/otlp/trace/v1"
-	resource_v1 "go.opentelemetry.io/proto/otlp/resource/v1"
-	trace_ingest "go.opentelemetry.io/proto/otlp/collector/trace/v1"
-
+	common "go.opentelemetry.io/proto/otlp/common/v1"        		// OTEL commons (basic data representation)
+	resource "go.opentelemetry.io/proto/otlp/resource/v1"    		// OTEL resource (metadata)
+	trace "go.opentelemetry.io/proto/otlp/trace/v1"                	// OTLP traces data representation
+	colTrace "go.opentelemetry.io/proto/otlp/collector/trace/v1"   	// OTLP trace service to push spans
+	
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
+	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 )
 
-func newID() []byte {
-	r := rand.Int63()
-	b := make([]byte, 8)
-	return big.NewInt(r).FillBytes(b)
-}
 
-
-func generateSpan() *trace_v1.Span {
+func generateSpan() *trace.Span {
 	now := uint64(time.Now().UnixNano())
-	rand.Seed(int64(now))
 
-	trace_id := append(newID(), newID()...)
-	span_id := newID()
-	name := "root"
 	start := now
-	return &trace_v1.Span{
-		TraceId:                trace_id,
-		SpanId:                 span_id,
+	return &trace.Span{
+		Name:                   "test-span", // An operation name
+		StartTimeUnixNano:      start,       // start timestamp
+		EndTimeUnixNano:        start + uint64(rand.Int63n(10000000)+10), // end timestamp
+		Attributes:             nil, // A list of key-value pairs
+		Events:                 []*trace.Span_Event{}, // A set of zero or more Events
+		ParentSpanId:           nil, // Parent's Span identifier
+		Links:                  []*trace.Span_Link{}, // Links to zero or more causally-related Spans (via the SpanContext to those related Spans)
+		// SpanContext. All the info that identifies Span in the Trace.
+		TraceId:                []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		SpanId:                 []byte{0, 0, 0, 0, 0, 0, 0, 2},
 		TraceState:             "",
-		ParentSpanId:           nil,
-		Name:                   name,
-		Kind:                   trace_v1.Span_SPAN_KIND_CLIENT,
-		StartTimeUnixNano:      start,
-		EndTimeUnixNano:        start + uint64(rand.Int63n(10000000)+10),
-		Attributes:             nil,
+		Kind:                   trace.Span_SPAN_KIND_CLIENT,
 		DroppedAttributesCount: 0,
-		Events:                 []*trace_v1.Span_Event{},
 		DroppedEventsCount:     0,
-		Links:                  []*trace_v1.Span_Link{},
 		DroppedLinksCount:      0,
-		Status:                 &trace_v1.Status{},
+		Status:                 &trace.Status{},
 	}
 }
 
-// func GetOtlpTrace() *trace_ingest.ExportTraceServiceRequest {
-// 	var spans []*trace_v1.Span
-// 	spans = append(spans, generateSpan())
-// 	resource_spans := []*trace_v1.ResourceSpans{
-// 		{
-// 			Resource: &resource_v1.Resource{
-// 				Attributes: []*common_v1.KeyValue{
-// 					{
-// 						Key: "service.name",
-// 						Value: &common_v1.AnyValue {
-// 							Value: &common_v1.AnyValue_StringValue{
-// 								StringValue: "gdi-ingest",
-// 							},
-// 						},
-// 					},
-// 				},
-// 				DroppedAttributesCount: 0,
-// 			},
-// 			ScopeSpans: []*trace_v1.ScopeSpans {
-// 				{
-// 					Scope: &common_v1.InstrumentationScope{
-// 						Name:    "gdi-ingest-grpc",
-// 						Version: "0.1.0",
-// 					},
-// 					Spans: spans,
-// 				},
-// 			},
-// 		},
-// 	}
-
-
-// 	return &trace_ingest.ExportTraceServiceRequest{ResourceSpans: resource_spans}
-// }
-
-func GetOtlpTrace() *trace_ingest.ExportTraceServiceRequest {
-	var spans []*trace_v1.Span
-	spans = append(spans, generateSpan())
-	resource_spans := []*trace_v1.ResourceSpans{
-		{
-			Resource: &resource_v1.Resource{
-			},
-			ScopeSpans: []*trace_v1.ScopeSpans {
+func getResource() *resource.Resource {
+	return &resource.Resource{
+			Attributes: []*common.KeyValue{
 				{
-					Scope: &common_v1.InstrumentationScope{
-						Name:    "otlp-grpc-sample-ingest",
-						Version: "1.0.0",
+					Key: "service.name",
+					Value: &common.AnyValue {
+						Value: &common.AnyValue_StringValue{
+							StringValue: "otlp-trace-generator",
+						},
 					},
-					Spans: spans,
 				},
 			},
+			DroppedAttributesCount: 0,
+		}
+}
+
+func getInstrumentationScope() *common.InstrumentationScope{
+	return &common.InstrumentationScope{
+		Name:    "Ingest-Tools-GO OTLP over gRPC sample trace generator",
+		Version: "1.0.0",
+	}
+}
+
+// A collection of Spans produced by an InstrumentationScope
+func getScopeSpans() []*trace.ScopeSpans{
+	return []*trace.ScopeSpans {
+		{
+			Scope: getInstrumentationScope(),		// can be nil
+			Spans: []*trace.Span{generateSpan()},
 		},
 	}
+}
 
+func GenerateOtlpTrace() []*trace.ResourceSpans {
+	return []*trace.ResourceSpans{
+		{
+			Resource: getResource(),
+			ScopeSpans: getScopeSpans(),
+		},
+	}
+}
 
-	return &trace_ingest.ExportTraceServiceRequest{ResourceSpans: resource_spans}
+func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resourceSpans []*trace.ResourceSpans) {
+	data := &colTrace.ExportTraceServiceRequest{ResourceSpans: resourceSpans}
+	security_option := "insecure"
+	var sec grpc.DialOption
+	if grpcInsecure {
+		sec = grpc.WithTransportCredentials(insecure.NewCredentials())
+	} else {
+		sec = grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{}))
+		security_option = "TLS"
+	}
+	log.Printf("Security option: %v", security_option)
+	log.Printf("Setting up a gRPC connection to %v", url)
+	conn, err := grpc.Dial(url, sec, grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("Failed to connect to gRPC server: %v", err)
+	}
+	log.Printf("Connection successful %v", conn)
+
+	auth := &grpcSfxAuth.SignalFxTokenAuth{Token: secret, DisableTransportSecurity: grpcInsecure}
+
+	ingest_cli := colTrace.NewTraceServiceClient(conn)
+	rs, err := ingest_cli.Export(context.Background(), data, grpc.PerRPCCredentials(auth))
+	if err != nil {
+		log.Fatalf("Failed to call gRPC Export methond: %v", err)
+	}
+	log.Printf("resoponse %v", rs.String())
 }

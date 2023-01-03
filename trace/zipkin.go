@@ -3,6 +3,11 @@ package trace
 import (
 	"math/rand"
 	"time"
+	"bytes"
+	"encoding/json"
+	"log"
+	"net/http"
+	"net/http/httputil"
 )
 
 type Endpoint struct {
@@ -51,4 +56,34 @@ func GenerateZipkinSample() []ZipkinSpan {
 		},
 	})
 	return trace
+}
+
+func SendZipkinTraceSample(url string, secret string, trace ZipkinTrace) {
+	contentType := "application/json"
+	json_data, err := json.MarshalIndent(trace, "", "\t")
+	if err != nil {
+		log.Fatalf("Marshal: %v", err)
+	}
+	log.Println("Sending sample data:\n" + string(json_data))
+
+	r, err := http.NewRequest("POST", url, bytes.NewBuffer(json_data))
+	r.Header.Add("Content-Type", contentType)
+	r.Header.Add("X-SF-Token", secret)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(r)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	dr, err := httputil.DumpResponse(resp, true)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println(string(dr))
 }

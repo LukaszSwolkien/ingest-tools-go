@@ -49,7 +49,7 @@ func main() {
 				content_type := "application/json"
 				log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
 				var json_data = trace.GenerateZipkinSample()
-				trace.PostZipkinTraceSample(ingest_url, *token, json_data)
+				trace.SendZipkinTraceSample(ingest_url, *token, json_data)
 			} else if (*protocol == "thrift") {
 				content_type := "x-thrift"
 				log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)
@@ -60,8 +60,8 @@ func main() {
 		case "v2/trace/otlp":
 			log.Printf("Protocol: otlp")
 			log.Printf("Transport: grpc")
-			otlp_data := trace.GetOtlpTrace()
-			trace.GrpcOtlpTraceSample(ingest_url, *token, *grpcInsecure, otlp_data)
+			otlp_data := trace.GenerateOtlpTrace()
+			trace.SendGrpcOtlpTraceSample(ingest_url, *token, *grpcInsecure, otlp_data)
 	default:
 		log.Fatalln("Unsupported endpoint")
 	}
