@@ -6,7 +6,7 @@ Create your organisation using Splunk API and setup access tokens (see [here](ht
 
 To test OTLP format over gRPC:
 ```bash
-go run main.go --token=my_token --endpoint=v2/trace/otlp --ingest=ingest.lab0.signalfx.com:443
+go run main.go --token=my_token --ingest=ingest.lab0.signalfx.com:443 --endpoint=v2/trace/otlp
 ```
 
 To test Zipkin Json format:
