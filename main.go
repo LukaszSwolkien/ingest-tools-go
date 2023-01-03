@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 	"github.com/LukaszSwolkien/IngestTools/shared"
 	"github.com/LukaszSwolkien/IngestTools/trace"
+	"github.com/LukaszSwolkien/IngestTools/metric"
 )
 
 var (
@@ -41,12 +43,20 @@ func loadConfiguration(){
 
 func dispatcher(endpoint string) {
 	switch endpoint {
+		case "v2/datapoint":
+			sfx_guage := metric.GenerateSfxGuageDatapointSample()
+			shared.SendDataSample(ingest_url, *token, sfx_guage)
+			for i := 0; i < 3; i++{
+				time.Sleep(time.Second)
+				sfx_counter := metric.GenerateSfxCounterDatapointSample()
+				shared.SendDataSample(ingest_url, *token, sfx_counter)
+			}
 		case "v2/trace":
 			if (*protocol == "zipkin"){
 				content_type := "application/json"
 				log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
-				var json_data = trace.GenerateZipkinSample()
-				trace.SendZipkinTraceSample(ingest_url, *token, json_data)
+				var zipkin_data = trace.GenerateZipkinSample()
+				shared.SendDataSample(ingest_url, *token, zipkin_data)
 			} else if (*protocol == "thrift") {
 				content_type := "x-thrift"
 				log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)

@@ -14,6 +14,10 @@ To test Zipkin Json format:
 go run main.go --token=my_token --ingest=https://ingest.REALM.signalfx.com --endpoint=v2/trace
 ```
 
+To test SignalFx Json Datapoint format:
+```bash
+go run main.go --token=my_token --ingest=https://ingest.REALM.signalfx.com --endpoint="v2/datapoint"
+```
 # Setup project 
 You can create `.conf.yaml` file with ingest url, token, endpoint etc defined instead of using command line args, for example:
 
