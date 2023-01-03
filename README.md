@@ -2,7 +2,7 @@
 Sample Golang tools to ingest telemetry data into Splunk Observability suite
 
 ## Usage examples:
-Create your organisation using Splunk API, and setup access tokens (see [here](https://github.com/LukaszSwolkien/ingest-tools)).
+Create your organisation using Splunk API and setup access tokens (see [here](https://github.com/LukaszSwolkien/ingest-tools)).
 
 To test OTLP format over gRPC:
 ```bash
