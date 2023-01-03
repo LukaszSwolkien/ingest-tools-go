@@ -18,7 +18,6 @@ var (
 
 )
 
-
 func loadConfiguration(){
 	var c shared.Conf
 	err := c.LoadConf(".conf.yaml")
@@ -37,13 +36,11 @@ func loadConfiguration(){
 		}
 	}
 	ingest_url = *ingest + "/" + *endpoint
+	log.Printf("Ingest endpoint: %v", ingest_url)
 }
 
-func main() {
-	flag.Parse()
-	loadConfiguration()
-	log.Printf("Ingest endpoint: %v", ingest_url)
-	switch *endpoint {
+func dispatcher(endpoint string) {
+	switch endpoint {
 		case "v2/trace":
 			if (*protocol == "zipkin"){
 				content_type := "application/json"
@@ -58,11 +55,16 @@ func main() {
 				log.Fatalf("SAPM format not implemented, Content-Type: %v", content_type)
 			}
 		case "v2/trace/otlp":
-			log.Printf("Protocol: otlp")
-			log.Printf("Transport: grpc")
+			log.Printf("Protocol: otlp, Transport: grpc")
 			otlp_data := trace.GenerateOtlpTrace()
 			trace.SendGrpcOtlpTraceSample(*ingest, *token, *grpcInsecure, otlp_data)
 	default:
 		log.Fatalln("Unsupported endpoint")
 	}
+}
+
+func main() {
+	flag.Parse()
+	loadConfiguration()
+	dispatcher(*endpoint)
 }
