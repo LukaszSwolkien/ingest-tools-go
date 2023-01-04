@@ -7,6 +7,7 @@ import (
 	"github.com/LukaszSwolkien/IngestTools/shared"
 	"github.com/LukaszSwolkien/IngestTools/trace"
 	"github.com/LukaszSwolkien/IngestTools/metric"
+	logevent "github.com/LukaszSwolkien/IngestTools/log"
 )
 
 var (
@@ -39,10 +40,14 @@ func loadConfiguration(){
 	}
 	ingest_url = *ingest + "/" + *endpoint
 	log.Printf("Ingest endpoint: %v", ingest_url)
+	log.Printf("Token: %v", *token)
 }
 
 func dispatcher(endpoint string) {
 	switch endpoint {
+		case "v1/log":
+			spl_event := logevent.GenerateLogSample()
+			shared.SendDataSample(ingest_url, *token, spl_event)
 		case "v2/datapoint":
 			sfx_guage := metric.GenerateSfxGuageDatapointSample()
 			shared.SendDataSample(ingest_url, *token, sfx_guage)
