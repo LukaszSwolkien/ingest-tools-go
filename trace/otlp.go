@@ -1,4 +1,4 @@
-// The sample OTLP generator for trace ingest data
+// The sample OTLP generator and sender functions for Splunk Observability trace-ingest endpoint
 package trace
 
 import (
@@ -6,17 +6,13 @@ import (
 	"math/rand"
 	"time"
 	"context"
-	"crypto/tls"
-	
-	common "go.opentelemetry.io/proto/otlp/common/v1"        		// OTEL commons (basic data representation)
-	resource "go.opentelemetry.io/proto/otlp/resource/v1"    		// OTEL resource (metadata)
-	trace "go.opentelemetry.io/proto/otlp/trace/v1"                	// OTLP traces data representation
-	colTrace "go.opentelemetry.io/proto/otlp/collector/trace/v1"   	// OTLP trace service to push spans
-	
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
+	
+	"github.com/LukaszSwolkien/IngestTools/shared"
+
+	trace "go.opentelemetry.io/proto/otlp/trace/v1"             	// OTLP traces data representation
+	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1"	// OTLP trace service
 )
 
 
@@ -44,34 +40,13 @@ func generateSpan() *trace.Span {
 	}
 }
 
-func getResource() *resource.Resource {
-	return &resource.Resource{
-			Attributes: []*common.KeyValue{
-				{
-					Key: "service.name",
-					Value: &common.AnyValue {
-						Value: &common.AnyValue_StringValue{
-							StringValue: "otlp-trace-generator",
-						},
-					},
-				},
-			},
-			DroppedAttributesCount: 0,
-		}
-}
 
-func getInstrumentationScope() *common.InstrumentationScope{
-	return &common.InstrumentationScope{
-		Name:    "Ingest-Tools-GO OTLP over gRPC sample trace generator",
-		Version: "1.0.0",
-	}
-}
 
 // A collection of Spans produced by an InstrumentationScope
 func getScopeSpans() []*trace.ScopeSpans{
 	return []*trace.ScopeSpans {
 		{
-			Scope: getInstrumentationScope(),		// can be nil
+			Scope: shared.GetInstrumentationScope("otlp-trace-generator"),		// can be nil
 			Spans: []*trace.Span{generateSpan()},
 		},
 	}
@@ -80,32 +55,21 @@ func getScopeSpans() []*trace.ScopeSpans{
 func GenerateOtlpTrace() []*trace.ResourceSpans {
 	return []*trace.ResourceSpans{
 		{
-			Resource: getResource(),
+			Resource: shared.GetResource("Ingest-Tools-GO OTLP over gRPC sample trace generator"),
 			ScopeSpans: getScopeSpans(),
 		},
 	}
 }
 
 func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resourceSpans []*trace.ResourceSpans) {
-	data := &colTrace.ExportTraceServiceRequest{ResourceSpans: resourceSpans}
-	security_option := "insecure"
-	var sec grpc.DialOption
-	log.Printf("insecure %v", grpcInsecure)
-	if grpcInsecure {
-		sec = grpc.WithTransportCredentials(insecure.NewCredentials())
-	} else {
-		sec = grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{}))
-		security_option = "TLS"
-	}
-	log.Printf("Security option: %v", security_option)
-	log.Printf("Setting up a gRPC connection to %v", url)
-	conn, err := grpc.Dial(url, sec, grpc.WithBlock())
+	data := &traceSvc.ExportTraceServiceRequest{ResourceSpans: resourceSpans}
+	conn, err := shared.GrpcConnection(url, grpcInsecure)
 	if err != nil {
 		log.Fatalf("Did not connect: %v", err)
 	}
 	defer conn.Close()
 	auth := &grpcSfxAuth.SignalFxTokenAuth{Token: secret, DisableTransportSecurity: grpcInsecure}
-	c := colTrace.NewTraceServiceClient(conn)
+	c := traceSvc.NewTraceServiceClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -113,9 +77,9 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resou
 	if err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
-	rejectSpand := rs.GetPartialSuccess()
-	if rejectSpand != nil {
-		log.Printf("Rejected spans %v", rejectSpand.ErrorMessage)
+	partialSuccess := rs.GetPartialSuccess()
+	if partialSuccess != nil {
+		log.Printf("Rejected spans %v", partialSuccess.ErrorMessage)
 
 	} else {
 		log.Printf("Request fully accepted")

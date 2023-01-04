@@ -56,6 +56,9 @@ func dispatcher(endpoint string) {
 				sfx_counter := metric.GenerateSfxCounterDatapointSample()
 				shared.SendDataSample(ingest_url, *token, sfx_counter)
 			}
+		case "v2/datapoint/otlp":
+			otlp_metric := metric.GenerateOtlpMetric()
+			metric.SendGrpcOtlpMetricSample(*ingest, *token, *grpcInsecure, otlp_metric)
 		case "v2/trace":
 			if (*protocol == "zipkin"){
 				content_type := "application/json"
