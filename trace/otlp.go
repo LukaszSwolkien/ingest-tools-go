@@ -7,6 +7,7 @@ import (
 	"time"
 	"context"
 	"google.golang.org/grpc"
+
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 	
 	"github.com/LukaszSwolkien/IngestTools/shared"
@@ -16,7 +17,7 @@ import (
 )
 
 
-func generateSpan() *trace.Span {
+func GenerateSpan() *trace.Span {
 	now := uint64(time.Now().UnixNano())
 
 	start := now
@@ -40,29 +41,28 @@ func generateSpan() *trace.Span {
 	}
 }
 
-
-
 // A collection of Spans produced by an InstrumentationScope
-func getScopeSpans() []*trace.ScopeSpans{
+func GetScopeSpans(span *trace.Span) []*trace.ScopeSpans{
 	return []*trace.ScopeSpans {
 		{
 			Scope: shared.GetInstrumentationScope("otlp-trace-generator"),		// can be nil
-			Spans: []*trace.Span{generateSpan()},
+			Spans: []*trace.Span{span},
 		},
 	}
 }
 
-func GenerateOtlpTrace() []*trace.ResourceSpans {
+func GetResourceSpans(span *trace.Span) []*trace.ResourceSpans {
 	return []*trace.ResourceSpans{
 		{
 			Resource: shared.GetResource("Ingest-Tools-GO OTLP over gRPC sample trace generator"),
-			ScopeSpans: getScopeSpans(),
+			ScopeSpans: GetScopeSpans(span),
 		},
 	}
 }
 
-func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, resourceSpans []*trace.ResourceSpans) {
-	data := &traceSvc.ExportTraceServiceRequest{ResourceSpans: resourceSpans}
+func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, span *trace.Span) {
+	resSpans := GetResourceSpans(span)
+	data := &traceSvc.ExportTraceServiceRequest{ResourceSpans: resSpans}
 	conn, err := shared.GrpcConnection(url, grpcInsecure)
 	if err != nil {
 		log.Fatalf("Did not connect: %v", err)

@@ -9,8 +9,7 @@ import (
 )
 
 // Converts data structure into json and sends to ingest 
-func SendDataSample(url string, secret string, data interface{}) {
-	contentType := "application/json"
+func SendDataSample(url string, secret string, contentType string, data interface{}) {
 	json_data, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		log.Fatalf("Marshal: %v", err)

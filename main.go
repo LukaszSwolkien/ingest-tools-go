@@ -47,14 +47,18 @@ func dispatcher(endpoint string) {
 	switch endpoint {
 		case "v1/log":
 			spl_event := logevent.GenerateLogSample()
-			shared.SendDataSample(ingest_url, *token, spl_event)
+			content_type := "application/json"
+			log.Printf("Splunk Event Log format, Content-Type: %v", content_type)
+			shared.SendDataSample(ingest_url, *token, content_type, spl_event)
 		case "v2/datapoint":
 			sfx_guage := metric.GenerateSfxGuageDatapointSample()
-			shared.SendDataSample(ingest_url, *token, sfx_guage)
+			content_type := "application/json"
+			log.Printf("SignalFx Datapoint format, Content-Type: %v", content_type)
+			shared.SendDataSample(ingest_url, *token, content_type, sfx_guage)
 			for i := 0; i < 3; i++{
 				time.Sleep(time.Second)
 				sfx_counter := metric.GenerateSfxCounterDatapointSample()
-				shared.SendDataSample(ingest_url, *token, sfx_counter)
+				shared.SendDataSample(ingest_url, *token, content_type, sfx_counter)
 			}
 		case "v2/datapoint/otlp":
 			otlp_metric := metric.GenerateOtlpMetric()
@@ -64,7 +68,7 @@ func dispatcher(endpoint string) {
 				content_type := "application/json"
 				log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
 				var zipkin_data = trace.GenerateZipkinSample()
-				shared.SendDataSample(ingest_url, *token, zipkin_data)
+				shared.SendDataSample(ingest_url, *token, content_type, zipkin_data)
 			} else if (*protocol == "thrift") {
 				content_type := "x-thrift"
 				log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)
@@ -74,8 +78,8 @@ func dispatcher(endpoint string) {
 			}
 		case "v2/trace/otlp":
 			log.Printf("Protocol: otlp, Transport: grpc")
-			otlp_data := trace.GenerateOtlpTrace()
-			trace.SendGrpcOtlpTraceSample(*ingest, *token, *grpcInsecure, otlp_data)
+			otlpSpan := trace.GenerateSpan()
+			trace.SendGrpcOtlpTraceSample(*ingest, *token, *grpcInsecure, otlpSpan)
 	default:
 		log.Fatalln("Unsupported endpoint")
 	}
