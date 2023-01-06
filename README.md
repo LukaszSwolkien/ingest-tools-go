@@ -1,16 +1,18 @@
 # Ingest-Tools-Go
 Sample Golang tools to ingest telemetry data into Splunk Observability suite
 
-## Usage examples:
-Create your organisation using Splunk API and setup access tokens (see [here](https://github.com/LukaszSwolkien/ingest-tools)).
+## Prerequisite
+Use your organisation or create a new one using Splunk API and setup access tokens (see [here](https://github.com/LukaszSwolkien/ingest-tools)).
 
+> **_NOTE:_**
+You can create `.conf.yaml` file with url, token, protocol, transport etc. These parameters will be used as default. You can skip entering command line args that are defined in the `.conf.yaml`, that you do not want to overwrite, for example: 
+```yaml
+token: "ACCESS_TOKEN"
+url: "https://ingest.REALM.signalfx.com:443"
+protocol: "otlp"
+```
 
-
-### Samples
-
-Splunk Observability ingest service full URL: 
-
-Concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT`
+# Samples
 
 |Ingest    | Transport | Protocol        | ENDPOINT           | Sample  |
 |----------|-----------|-----------------|--------------------|---------|
@@ -29,14 +31,16 @@ Concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT`
 |rum       |           | OTLP/logs/v1    |                    | &cross; |
 |profiling |           | OTLP/logs/v1    |                    | &cross; |
 
-### Protocols:
+## Protocols:
 
 * [OTLP proto files](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto) 
 * [Zipkin JSON](https://zipkin.io/pages/data_model.html)
 * [SignalFx JSON](https://dev.splunk.com/observability/reference/api/ingest_data/latest#endpoint-send-metrics)
 * [Splunk HEC](https://docs.splunk.com/Documentation/Splunk/latest/Data/FormatEventsforHTTPEventCollector)
 
-### Examples:
+## Examples:
+
+> **_NOTE_**: concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT` for ingest url (see above table)
 
 * OTLP/gRPC trace sample:
 ```bash
@@ -61,14 +65,4 @@ go run . --ingest=metrics --protocol=otlp --transpoer=http --token=TOKEN --url=h
 * Splunk HEC/HTTP log sample:
 ```
 go run . --ingest=log --protocol=hec --transport=http --token=TOKEN --url=https://ingest.REALM.signalfx.com/v1/logs
-```
-
-# Setup project 
-You can create `.conf.yaml` file with ingest url, token, endpoint etc defined instead of using command line args, for example:
-
-```yaml
-token: "YOUR_ACCESS_TOKEN"
-ingest: "https://ingest.REALM.signalfx.com"
-endpoint: "v2/trace" 
-protocol: "zipkin"
 ```
