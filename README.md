@@ -46,25 +46,25 @@ url: "ingest.REALM.signalfx.com:443"
 
 * OTLP/gRPC trace sample:
 ```bash
-go run . --ingest=trace --protocol=otlp --transport=grpc --token=TOKEN --url=ingest.REALM.signalfx.com:443
+go run . -i=trace -p=otlp -t=grpc -url=ingest.REALM.signalfx.com:443 -token=TOKEN
 ```
 
 * Zipkin Json/HTTP trace sample:
 ```bash
-go run . --ingest=trace --protocol=zipkin --transport=http --token=TOKEN --url=https://ingest.REALM.signalfx.com/v2/trace
+go run . -i=trace -p=zipkin -t=http -url=https://ingest.lab0.signalfx.com/v2/trace -token=TOKEN
 ```
 
 * SignalFx Json Datapoint/HTTP metrics sample:
 ```bash
-go run . --ingest=metrics --protocol=sfx --transpoer=http --token=TOKEN --url=https://ingest.REALM.signalfx.com/v2/datapoint
+go run . -i=metrics -p=sfx -t=http -url=https://ingest.REALM.signalfx.com/v2/datapoint -token=TOKEN
 ```
 
 * OTLP/HTTP metrics sample:
 ```bash
-go run . --ingest=metrics --protocol=otlp --transpoer=http --token=TOKEN --url=https://ingest.REALM.signalfx.com/v2/datapoint/otlp
+go run . -i=metrics -p=otlp -t=http -url=https://ingest.REALM.signalfx.com/v2/datapoint/otlp -token=TOKEN
 ```
 
 * Splunk HEC/HTTP log sample:
 ```
-go run . --ingest=log --protocol=hec --transport=http --token=TOKEN --url=https://ingest.REALM.signalfx.com/v1/logs
+go run . -i=log -p=hec -t=http -url=https://ingest.REALM.signalfx.com/v1/logs -token=TOKEN
 ```
