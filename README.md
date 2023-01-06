@@ -8,15 +8,17 @@ Use your organisation or create a new one using Splunk API and setup access toke
 You can create `.conf.yaml` file with url, token, protocol, transport etc. These parameters will be used as default. You can skip entering command line args that are defined in the `.conf.yaml`, that you do not want to overwrite, for example: 
 ```yaml
 token: "ACCESS_TOKEN"
-url: "https://ingest.REALM.signalfx.com:443"
+ingest: "trace"
 protocol: "otlp"
+transport: "grpc"
+url: "ingest.REALM.signalfx.com:443"
 ```
 
 # Samples
 
 |Ingest    | Transport | Protocol        | ENDPOINT           | Sample  |
 |----------|-----------|-----------------|--------------------|---------|
-|trace     |   gRPC    | OTLP/trace/v1   | :443               | &check; |
+|trace     |   gRPC    | OTLP/trace/v1   | (port:443)         | &check; |
 |trace     |   HTTP    | OTLP/trace/v1   | /v2/trace/otlp     | &cross; |
 |trace     |   HTTP    | Zipkin JSON     | /v2/trace          | &check; |
 |metrics   |   gRPC    | OTLP/metrics/v1 | _not implemented_  |  NA     |
@@ -25,9 +27,9 @@ protocol: "otlp"
 |log       |   gRPC    | OTLP/logs/v1    | _not implemented_  |  NA     |
 |log       |   HTTP    | OTLP/logs/v1    | _not implemented_  |  NA     |
 |log       |   HTTP    | Splunk HEC      | /v1/log            | &check; |
-|event     |   gRPC    | OTLP/logs/v1    | _not implemented_  | NA      |
-|event     |   HTTP    | OTLP/logs/v1    | v3/events          | &cross; |
-|event     |   HTTP    | SignalFx        | v2/events          | &cross; |
+|events    |   gRPC    | OTLP/logs/v1    | _not implemented_  | NA      |
+|events    |   HTTP    | OTLP/logs/v1    | v3/events          | &cross; |
+|events    |   HTTP    | SignalFx        | v2/events          | &cross; |
 |rum       |           | OTLP/logs/v1    |                    | &cross; |
 |profiling |           | OTLP/logs/v1    |                    | &cross; |
 
@@ -40,7 +42,7 @@ protocol: "otlp"
 
 ## Examples:
 
-> **_NOTE_**: concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT` for ingest url (see above table)
+> **_NOTE_**: concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT` for ingest url (see above table) with HTTP transport. Use `ingest.REALM.signalfx.com` for gRPC calls.
 
 * OTLP/gRPC trace sample:
 ```bash

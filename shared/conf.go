@@ -8,12 +8,12 @@ import (
 )
 
 type Conf struct {
-	Token    		string `yaml:"token"`
 	Ingest		   	string `yaml:"ingest"`
-	Endpoint 		string `yaml:"endpoint"`
 	Protocol		string `yaml:"protocol"`
+	Transport 		string `yaml:"transport"`
+	Token    		string `yaml:"token"`
+	IngestUrl 		string `yaml:"url"`
 	GrpcInsecure	string `yaml:"grpc-insecure"`
- 
 }
 
 func (c *Conf) LoadConf(confFile string) (error) {

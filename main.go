@@ -7,13 +7,12 @@ import (
 )
 
 var (
-	ingest = flag.String("ingest", "", "ingest url")
-	endpoint = flag.String("endpoint", "", "The ingest type (v1/log, v2/trace, v2/trace/otlp, v2/datapoint, v2/datapoint/otlp)")
+	ingest = flag.String("ingest", "", "ingest type (trace, metrics, logs, events, rum...)")
+	protocol = flag.String("protocol", "", "The request protocol (zipkin, otlp, sapm, thrift)")
+	transport = flag.String("transport", "", "Transport (http, grpc)")
 	token = flag.String("token", "", "Ingest access token")
-	protocol = flag.String("protocol", "zipkin", "The request protocol (zipkin, otlp, sapm, thrift)")
+	ingestUrl = flag.String("url", "", "The URL to ingest endpoint")
 	grpcInsecure = flag.Bool("grpc-insecure", false, "Set grpc-insecure=false to enable TLS")
-	transport = flag.String("transport", "grpc", "Transport (http, grpc)")
-	ingest_url = ""
 )
 
 func loadConfiguration(){
@@ -23,18 +22,22 @@ func loadConfiguration(){
 		if *ingest == "" {
 			*ingest = c.Ingest
 		}
-		if *token == "" {
-			*token = c.Token
-		}
-		if *endpoint == "" {
-			*endpoint = c.Endpoint
-		}
 		if *protocol == "" {
 			*protocol = c.Protocol
 		}
+		if *transport == "" {
+			*transport = c.Transport
+		}
+		if *ingestUrl == "" {
+			*ingestUrl = c.IngestUrl
+		}
+		if *token == "" {
+			*token = c.Token
+		}
 	}
-	ingest_url = *ingest + "/" + *endpoint
-	log.Printf("Ingest endpoint: %v", ingest_url)
+	log.Printf("Ingest: %v", *ingest)
+	log.Printf("Ingest endpoint: %v", *ingestUrl)
+	log.Printf("Protocol: %v", *protocol)
 	log.Printf("Token: %v", *token)
 }
 
@@ -44,7 +47,7 @@ func main() {
 	loadConfiguration()
 	d := setup(dispatcherConfig{
 		ingest: *ingest,
-		endpoint: *endpoint,
+		ingestUrl: *ingestUrl,
 		token: *token,
 		protocol: *protocol,
 		grpcInsecure: *grpcInsecure,
