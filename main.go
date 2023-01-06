@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	ingest = flag.String("ingest", "", "ingest type (trace, metrics, logs, events, rum...)")
-	protocol = flag.String("protocol", "", "The request protocol (zipkin, otlp, sapm, thrift)")
-	transport = flag.String("transport", "", "Transport (http, grpc)")
+	ingest = flag.String("i", "", "ingest type (trace, metrics, logs, events, rum...)")
+	protocol = flag.String("p", "", "The request protocol (zipkin, otlp, sapm, thrift)")
+	transport = flag.String("t", "", "Transport (http, grpc)")
 	token = flag.String("token", "", "Ingest access token")
 	ingestUrl = flag.String("url", "", "The URL to ingest endpoint")
 	grpcInsecure = flag.Bool("grpc-insecure", false, "Set grpc-insecure=false to enable TLS")
