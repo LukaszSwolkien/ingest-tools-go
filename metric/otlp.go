@@ -4,7 +4,7 @@ import (
 	"log"
 	"context"
 	"time"
-	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1" 	// OTLP metrics service
+	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1"	// OTLP metrics service
 	metric "go.opentelemetry.io/proto/otlp/metrics/v1"        		// OTLP metrics data representation
 
 	"github.com/LukaszSwolkien/IngestTools/shared"
