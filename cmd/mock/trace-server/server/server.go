@@ -1,35 +1,33 @@
 package server
 
 import (
-	"os"
-	"log"
-	"fmt"
 	"context"
+	"fmt"
+	"log"
 	"net"
+	"os"
 	// status "google.golang.org/grpc/status"
 	// codes "google.golang.org/grpc/codes"
 	colTrace "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 
+	"github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
 )
-
 
 type Server struct {
 	colTrace.UnimplementedTraceServiceServer
 	server.Core
-	signalChan      chan os.Signal
-	ctx context.Context
-	grpcListener	net.Listener
-	grpcServer		*grpc.Server
+	signalChan   chan os.Signal
+	ctx          context.Context
+	grpcListener net.Listener
+	grpcServer   *grpc.Server
 	// httpListener	net.Listener
 }
 
-
 func (s *Server) Export(ctx context.Context, in *colTrace.ExportTraceServiceRequest) (*colTrace.ExportTraceServiceResponse, error) {
 	log.Printf("Received: %v", in.String())
-	
+
 	// return nil, status.Errorf(codes.Unimplemented, "method Export not implemented")
 	return &colTrace.ExportTraceServiceResponse{PartialSuccess: nil}, nil
 }
@@ -55,12 +53,12 @@ func (s *Server) SignalChan() chan os.Signal {
 	return s.signalChan
 }
 
-func (s* Server)Main() {
+func (s *Server) Main() {
 	err := s.start()
 	if err == nil {
 		log.Printf("%v is started", s.Core.Conf.ServiceName)
 		defer log.Printf("Server exited")
-		waitForSignal := <- s.signalChan 
+		waitForSignal := <-s.signalChan
 		log.Printf("* signal %v", waitForSignal)
 		s.shutdown()
 	}

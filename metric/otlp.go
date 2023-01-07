@@ -1,16 +1,15 @@
 package metric
 
 import (
-	"log"
 	"context"
+	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1" // OTLP metrics service
+	metric "go.opentelemetry.io/proto/otlp/metrics/v1"              // OTLP metrics data representation
+	"log"
 	"time"
-	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1"	// OTLP metrics service
-	metric "go.opentelemetry.io/proto/otlp/metrics/v1"        		// OTLP metrics data representation
 
 	"github.com/LukaszSwolkien/IngestTools/shared"
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 	"google.golang.org/grpc"
-
 )
 
 func GenerateOtlpMetric() *metric.Metric {
@@ -20,19 +19,19 @@ func GenerateOtlpMetric() *metric.Metric {
 }
 
 // A collection of Spans produced by an InstrumentationScope
-func getScopeMetrics(metrics *metric.Metric) []*metric.ScopeMetrics{
-	return []*metric.ScopeMetrics {
+func getScopeMetrics(metrics *metric.Metric) []*metric.ScopeMetrics {
+	return []*metric.ScopeMetrics{
 		{
-			Scope: shared.GetInstrumentationScope("otlp-metric-generator"),		// can be nil
+			Scope:   shared.GetInstrumentationScope("otlp-metric-generator"), // can be nil
 			Metrics: []*metric.Metric{metrics},
 		},
 	}
 }
 
-func getResourceMetric(metrics *metric.Metric) []*metric.ResourceMetrics{
+func getResourceMetric(metrics *metric.Metric) []*metric.ResourceMetrics {
 	return []*metric.ResourceMetrics{
 		{
-			Resource: shared.GetResource("otlp-metric-generator"),
+			Resource:     shared.GetResource("otlp-metric-generator"),
 			ScopeMetrics: getScopeMetrics(metrics),
 		},
 	}

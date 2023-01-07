@@ -1,7 +1,8 @@
 package metric
+
 import (
-	"os"
 	"math/rand"
+	"os"
 )
 
 var (
@@ -9,10 +10,10 @@ var (
 )
 
 type Datapoint struct {
-	Metric      string `json:"metric" binding:"required"`
-	Value       int64 `json:"value" binding:"required"`
-	Dimensions  *map[string]string `json:"dimensions,omitempty" bson:"dimensions,omitempty"`
-	Timestamp	*uint64 `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
+	Metric     string             `json:"metric" binding:"required"`
+	Value      int64              `json:"value" binding:"required"`
+	Dimensions *map[string]string `json:"dimensions,omitempty" bson:"dimensions,omitempty"`
+	Timestamp  *uint64            `json:"timestamp,omitempty" bson:"timestamp,omitempty"`
 }
 
 type GuageDatapoint struct {
@@ -29,15 +30,15 @@ type CumulativeCounterDatapoint struct {
 
 func GenerateSfxGuageDatapointSample() GuageDatapoint {
 	hostName, err := os.Hostname()
-	if (err != nil){
-		hostName="unknown"
+	if err != nil {
+		hostName = "unknown"
 	}
 	g := []Datapoint{
 		{
-		Metric: "heartbeat", 
-		Value: rand.Int63n(1000), 
-		Dimensions: &map[string]string{
-			"host": hostName,
+			Metric: "heartbeat",
+			Value:  rand.Int63n(1000),
+			Dimensions: &map[string]string{
+				"host": hostName,
 			},
 		},
 	}
@@ -47,15 +48,15 @@ func GenerateSfxGuageDatapointSample() GuageDatapoint {
 func counter() []Datapoint {
 	counterValue++
 	hostName, err := os.Hostname()
-	if (err != nil){
-		hostName="unknown"
+	if err != nil {
+		hostName = "unknown"
 	}
 	return []Datapoint{
 		{
-		Metric: "number-of-requests", 
-		Value: counterValue, 
-		Dimensions: &map[string]string{
-			"host": hostName,
+			Metric: "number-of-requests",
+			Value:  counterValue,
+			Dimensions: &map[string]string{
+				"host": hostName,
 			},
 		},
 	}
