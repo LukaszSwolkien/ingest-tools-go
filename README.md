@@ -48,11 +48,11 @@ Usage:
     go run . -i=INGEST -p=PROTOCOL -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
 Options:
     -i  The INGEST type (trace, metrics, logs, events, rum)
-	-p  The request PROTOCOL (zipkin, otlp, sapm, thrift)
-	-t  TRANSPORT (http, grpc)
-	-token  Ingest access TOKEN
-	-url    The URL to ingest endpoint
-	-grpc-insecure  (optional) Set grpc-insecure=true to disable TLS
+    -p  The request PROTOCOL (zipkin, otlp, sapm, thrift)
+    -t  TRANSPORT (http, grpc)
+    -token  Ingest access TOKEN
+    -url    The URL to ingest endpoint
+    -grpc-insecure  (optional) Set grpc-insecure=true to disable TLS
 ```
 
 > **_NOTE_**: concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT` for ingest url (see above table) with HTTP transport. Use `ingest.REALM.signalfx.com` for gRPC calls.

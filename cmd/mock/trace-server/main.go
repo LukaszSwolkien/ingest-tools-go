@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 	s := server.New(core.Conf{
 		ServiceName: "trace-server-mock",
-		GrpcPort: uint16(*port),
+		GrpcPort:    uint16(*port),
 	})
 
 	signal.Notify(s.SignalChan(), syscall.SIGTERM, syscall.SIGINT)

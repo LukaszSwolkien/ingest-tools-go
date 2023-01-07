@@ -8,15 +8,15 @@ import (
 )
 
 type Conf struct {
-	Ingest		   	string `yaml:"ingest"`
-	Protocol		string `yaml:"protocol"`
-	Transport 		string `yaml:"transport"`
-	Token    		string `yaml:"token"`
-	IngestUrl 		string `yaml:"url"`
-	GrpcInsecure	string `yaml:"grpc-insecure"`
+	Ingest       string `yaml:"ingest"`
+	Protocol     string `yaml:"protocol"`
+	Transport    string `yaml:"transport"`
+	Token        string `yaml:"token"`
+	IngestUrl    string `yaml:"url"`
+	GrpcInsecure string `yaml:"grpc-insecure"`
 }
 
-func (c *Conf) LoadConf(confFile string) (error) {
+func (c *Conf) LoadConf(confFile string) error {
 	yamlFile, err := os.ReadFile(confFile)
 	if err != nil {
 		log.Printf("cannot read configuration, err to %v", err)

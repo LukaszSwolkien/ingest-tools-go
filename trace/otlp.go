@@ -2,33 +2,32 @@
 package trace
 
 import (
+	"context"
+	"google.golang.org/grpc"
 	"log"
 	"math/rand"
 	"time"
-	"context"
-	"google.golang.org/grpc"
 
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
-	
+
 	"github.com/LukaszSwolkien/IngestTools/shared"
 
-	trace "go.opentelemetry.io/proto/otlp/trace/v1"             	// OTLP traces data representation
-	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1"	// OTLP trace service
+	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1" // OTLP trace service
+	trace "go.opentelemetry.io/proto/otlp/trace/v1"              // OTLP traces data representation
 )
-
 
 func GenerateSpan() *trace.Span {
 	now := uint64(time.Now().UnixNano())
 
 	start := now
 	return &trace.Span{
-		Name:                   "test-span", // An operation name
-		StartTimeUnixNano:      start,       // start timestamp
-		EndTimeUnixNano:        start + uint64(rand.Int63n(10000000)+10), // end timestamp
-		Attributes:             nil, // A list of key-value pairs
-		Events:                 []*trace.Span_Event{}, // A set of zero or more Events
-		ParentSpanId:           nil, // Parent's Span identifier
-		Links:                  []*trace.Span_Link{}, // Links to zero or more causally-related Spans (via the SpanContext to those related Spans)
+		Name:              "test-span",                              // An operation name
+		StartTimeUnixNano: start,                                    // start timestamp
+		EndTimeUnixNano:   start + uint64(rand.Int63n(10000000)+10), // end timestamp
+		Attributes:        nil,                                      // A list of key-value pairs
+		Events:            []*trace.Span_Event{},                    // A set of zero or more Events
+		ParentSpanId:      nil,                                      // Parent's Span identifier
+		Links:             []*trace.Span_Link{},                     // Links to zero or more causally-related Spans (via the SpanContext to those related Spans)
 		// SpanContext. All the info that identifies Span in the Trace.
 		TraceId:                []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		SpanId:                 []byte{0, 0, 0, 0, 0, 0, 0, 2},
@@ -42,10 +41,10 @@ func GenerateSpan() *trace.Span {
 }
 
 // A collection of Spans produced by an InstrumentationScope
-func GetScopeSpans(span *trace.Span) []*trace.ScopeSpans{
-	return []*trace.ScopeSpans {
+func GetScopeSpans(span *trace.Span) []*trace.ScopeSpans {
+	return []*trace.ScopeSpans{
 		{
-			Scope: shared.GetInstrumentationScope("otlp-trace-generator"),		// can be nil
+			Scope: shared.GetInstrumentationScope("otlp-trace-generator"), // can be nil
 			Spans: []*trace.Span{span},
 		},
 	}
@@ -54,7 +53,7 @@ func GetScopeSpans(span *trace.Span) []*trace.ScopeSpans{
 func GetResourceSpans(span *trace.Span) []*trace.ResourceSpans {
 	return []*trace.ResourceSpans{
 		{
-			Resource: shared.GetResource("Ingest-Tools-GO OTLP over gRPC sample trace generator"),
+			Resource:   shared.GetResource("Ingest-Tools-GO OTLP over gRPC sample trace generator"),
 			ScopeSpans: GetScopeSpans(span),
 		},
 	}

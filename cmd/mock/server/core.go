@@ -1,14 +1,14 @@
 package server
 
 type Conf struct {
-	ServiceName		string
-	HttpPort		uint16
-	GrpcPort		uint16
+	ServiceName string
+	HttpPort    uint16
+	GrpcPort    uint16
 }
 
-type Core struct{
+type Core struct {
 	Conf
-	// TODO: add anything common to futher send data for debugging	
+	// TODO: add anything common to futher send data for debugging
 }
 
 // Init the core with the provided config.

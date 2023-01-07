@@ -8,7 +8,7 @@ import (
 	"net/http/httputil"
 )
 
-// Converts data structure into json and sends to ingest 
+// Converts data structure into json and sends to ingest
 func SendDataSample(url string, secret string, contentType string, data interface{}) {
 	json_data, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
