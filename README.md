@@ -14,7 +14,7 @@ transport: "grpc"
 url: "ingest.REALM.signalfx.com:443"
 ```
 
-# Samples
+# What samples are implemented
 
 |Ingest    | Transport | Protocol        | ENDPOINT           | Sample  |
 |----------|-----------|-----------------|--------------------|---------|
@@ -40,9 +40,24 @@ url: "ingest.REALM.signalfx.com:443"
 * [SignalFx JSON](https://dev.splunk.com/observability/reference/api/ingest_data/latest#endpoint-send-metrics)
 * [Splunk HEC](https://docs.splunk.com/Documentation/Splunk/latest/Data/FormatEventsforHTTPEventCollector)
 
-## Examples:
+# Usage
+
+ingest tool needs following parameters to run:
+```bash
+Usage:
+    go run . -i=INGEST -p=PROTOCOL -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
+Options:
+    -i  The INGEST type (trace, metrics, logs, events, rum)
+	-p  The request PROTOCOL (zipkin, otlp, sapm, thrift)
+	-t  TRANSPORT (http, grpc)
+	-token  Ingest access TOKEN
+	-url    The URL to ingest endpoint
+	-grpc-insecure  (optional) Set grpc-insecure=true to disable TLS
+```
 
 > **_NOTE_**: concatenate `https://ingest.REALM.signalfx.com` with `ENDPOINT` for ingest url (see above table) with HTTP transport. Use `ingest.REALM.signalfx.com` for gRPC calls.
+
+## Examples:
 
 * OTLP/gRPC trace sample:
 ```bash
@@ -65,6 +80,15 @@ go run . -i=metrics -p=otlp -t=http -url=https://ingest.REALM.signalfx.com/v2/da
 ```
 
 * Splunk HEC/HTTP log sample:
-```
+```bash
 go run . -i=log -p=hec -t=http -url=https://ingest.REALM.signalfx.com/v1/logs -token=TOKEN
+```
+
+# Mock ingest services
+You can use a mock server to consume samples instead of the actual endpoint, however you won't be able to see the sent data in Splunk Observability suite.
+
+To run the mock trace-ingest service:
+
+```bash
+go run ./cmd/mock/trace-server
 ```
