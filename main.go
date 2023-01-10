@@ -8,7 +8,7 @@ import (
 
 var (
 	ingest       = flag.String("i", "", "ingest type (trace, metrics, logs, events, rum...)")
-	protocol     = flag.String("p", "", "The request protocol (zipkin, otlp, sapm, thrift)")
+	schema     = flag.String("s", "", "The request schema (zipkin, otlp, sapm, thrift)")
 	transport    = flag.String("t", "", "Transport (http, grpc)")
 	token        = flag.String("token", "", "Ingest access token")
 	ingestUrl    = flag.String("url", "", "The URL to ingest endpoint")
@@ -22,8 +22,8 @@ func loadConfiguration() {
 		if *ingest == "" {
 			*ingest = c.Ingest
 		}
-		if *protocol == "" {
-			*protocol = c.Protocol
+		if *schema == "" {
+			*schema = c.Schema
 		}
 		if *transport == "" {
 			*transport = c.Transport
@@ -37,7 +37,7 @@ func loadConfiguration() {
 	}
 	log.Printf("Ingest: %v", *ingest)
 	log.Printf("Ingest endpoint: %v", *ingestUrl)
-	log.Printf("Protocol: %v", *protocol)
+	log.Printf("Schema: %v", *schema)
 	log.Printf("Token: %v", *token)
 }
 
@@ -48,7 +48,7 @@ func main() {
 		ingest:       *ingest,
 		ingestUrl:    *ingestUrl,
 		token:        *token,
-		protocol:     *protocol,
+		schema:     *schema,
 		grpcInsecure: *grpcInsecure,
 		transport:    *transport,
 	})
