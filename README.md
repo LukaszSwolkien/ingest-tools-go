@@ -16,30 +16,32 @@ url: "ingest.REALM.signalfx.com:443"
 
 # What samples are implemented
 
-|Ingest type | Transport | Data-Format     | Endpoint               | Content-Type           | Sample  |
-|------------|-----------|-----------------|------------------------|------------------------|---------|
-|trace       |   gRPC    | OTLP/trace/v1   | (port:443)             | application/grpc       | &check; |
-|trace       |   HTTP    | OTLP/trace/v1   | /v2/trace/otlp         | application/x-protobuf | &cross; |
-|trace       |   HTTP    | Zipkin JSON     | /v2/trace              | application/json       | &check; |
-|trace       |   HTTP    | SAPM            | /v2/trace/sapm         | application/x-protobuf | &cross; |
-|trace       |   HTTP    | SignalFx JSON   | /v2/trace/signalfxv1   | application/json       | &cross; |
-|trace       |   HTTP    | JaegerThrift    | /v2/trace/jeagerthrift | application/x-thrift   | &cross; |
-|metrics     |   HTTP    | OTLP/metrics/v1 | /v2/datapoint/otlp     | application/x-protobuf | &check; |
-|metrics     |   HTTP    | SignalFx JSON   | /v2/datapoint          | application/json       | &check; |
-|log         |   HTTP    | Splunk HEC      | /v1/log                | application/json       | &check; |
-|profiling   |   HTTP    | OTLP/logs/v1    | /v1/log                | application/json       | &cross; |
-|log         |   HTTP    | Splunk HEC      | /services/collector    | application/json       | &cross; |
-|events      |   HTTP    | OTLP/logs/v1    | v3/events              | application/x-protobuf | &cross; |
-|events      |   HTTP    | SignalFx        | v2/events              | application/json       | &cross; |
-|rum         |   HTTP    | Zipkin JSON     | v1/rum                 | application/json       | &cross; |
-|rum         |   HTTP    | OTLP/logs/v1    | v1/rumreplay           | application/x-protobuf | &cross; |
-|rum         |   HTTP    | Zipkin JSON     | v1/rumreplay           | application/json       | &cross; |
-## Schemas:
+|Ingest type | Transport | Data-Format        | Endpoint               | Content-Type           | Sample  |
+|------------|-----------|--------------------|------------------------|------------------------|---------|
+|trace       |   gRPC    | OTLP/trace/v1      | (port:443)             | application/grpc       | &check; |
+|trace       |   HTTP    | OTLP/trace/v1      | /v2/trace/otlp         | application/x-protobuf | &cross; |
+|trace       |   HTTP    | Zipkin JSON        | /v2/trace              | application/json       | &check; |
+|trace       |   HTTP    | SAPM               | /v2/trace/sapm         | application/x-protobuf | &cross; |
+|trace       |   HTTP    | SignalFx Trace      | /v2/trace/signalfxv1   | application/json       | &cross; |
+|trace       |   HTTP    | JaegerThrift       | /v2/trace/jeagerthrift | application/x-thrift   | &cross; |
+|metrics     |   HTTP    | OTLP/metrics/v1    | /v2/datapoint/otlp     | application/x-protobuf | &check; |
+|metrics     |   HTTP    | SignalFx Datapoint | /v2/datapoint          | application/json       | &check; |
+|log         |   HTTP    | Splunk HEC         | /v1/log                | application/json       | &check; |
+|profiling   |   HTTP    | OTLP/logs/v1       | /v1/log                | application/json       | &cross; |
+|log         |   HTTP    | Splunk HEC         | /services/collector    | application/json       | &cross; |
+|events      |   HTTP    | OTLP/logs/v1       | v3/events              | application/x-protobuf | &cross; |
+|events      |   HTTP    | SignalFx Event     | v2/events              | application/json       | &cross; |
+|rum         |   HTTP    | Zipkin JSON        | v1/rum                 | application/json       | &cross; |
+|rum         |   HTTP    | OTLP/logs/v1       | v1/rumreplay           | application/x-protobuf | &cross; |
+|rum         |   HTTP    | Zipkin JSON        | v1/rumreplay           | application/json       | &cross; |
+## Data formats:
 
 * [OTLP proto files](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto) 
 * [SAPM (Splunk APM Protocol) ProtoBuf schema](https://github.com/signalfx/sapm-proto)
 * [Zipkin JSON](https://zipkin.io/pages/data_model.html)
-* [SignalFx JSON](https://dev.splunk.com/observability/reference/api/ingest_data/latest#endpoint-send-metrics)
+* [SignalFx Datapoint](https://dev.splunk.com/observability/reference/api/ingest_data/latest#endpoint-send-metrics)
+* [SignalFx Event](https://dev.splunk.com/observability/reference/api/ingest_data/latest#endpoint-send-events)
+* [SignalFx Trace](https://dev.splunk.com/observability/reference/api/ingest_data/latest#endpoint-sendtraces)
 * [Splunk HEC](https://docs.splunk.com/Documentation/Splunk/latest/Data/FormatEventsforHTTPEventCollector)
 * [Jaeger](https://www.jaegertracing.io/docs/1.41/apis/)
 
