@@ -3,26 +3,32 @@ package shared
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
 )
 
 // Converts data structure into json and sends to ingest
-func SendDataSample(url string, secret string, contentType string, data interface{}) {
+func SendData(url string, secret string, contentType string, data interface{}) {
 	json_data, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		log.Fatalf("Marshal: %v", err)
 	}
 	log.Println("Sending sample data:\n" + string(json_data))
 
-	r, err := http.NewRequest("POST", url, bytes.NewBuffer(json_data))
-	r.Header.Add("Content-Type", contentType)
-	r.Header.Add("X-SF-Token", secret)
+	body := bytes.NewBuffer(json_data)
+	PostHttpRequest(url, secret, contentType, body)
+
+}
+
+func PostHttpRequest(url string, secret string, contentType string, body io.Reader) {
+	r, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	r.Header.Add("Content-Type", contentType)
+	r.Header.Add("X-SF-Token", secret)
 	client := &http.Client{}
 
 	resp, err := client.Do(r)

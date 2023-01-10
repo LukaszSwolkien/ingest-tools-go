@@ -8,7 +8,7 @@ import (
 
 var (
 	ingest       = flag.String("i", "", "ingest type (trace, metrics, logs, events, rum...)")
-	schema     = flag.String("s", "", "The request schema (zipkin, otlp, sapm, thrift)")
+	schema       = flag.String("s", "", "The request schema (zipkin, otlp, sapm, thrift)")
 	transport    = flag.String("t", "", "Transport (http, grpc)")
 	token        = flag.String("token", "", "Ingest access token")
 	ingestUrl    = flag.String("url", "", "The URL to ingest endpoint")
@@ -48,7 +48,7 @@ func main() {
 		ingest:       *ingest,
 		ingestUrl:    *ingestUrl,
 		token:        *token,
-		schema:     *schema,
+		schema:       *schema,
 		grpcInsecure: *grpcInsecure,
 		transport:    *transport,
 	})

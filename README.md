@@ -25,7 +25,7 @@ url: "ingest.REALM.signalfx.com:443"
 |trace     |   HTTP    | SignalFx JSON   | /v2/trace/signalfxv1   | application/json       | &cross; |
 |trace     |   HTTP    | JaegerThrift    | /v2/trace/jeagerthrift | application/x-thrift   | &cross; |
 |metrics   |   gRPC    | OTLP/metrics/v1 | _not implemented_      | NA                     | NA      |
-|metrics   |   HTTP    | OTLP/metrics/v1 | /v2/datapoint/otlp     | application/x-protobuf | &cross; |
+|metrics   |   HTTP    | OTLP/metrics/v1 | /v2/datapoint/otlp     | application/x-protobuf | &check; |
 |metrics   |   HTTP    | SignalFx JSON   | /v2/datapoint          | application/json       | &check; |
 |log       |   gRPC    | OTLP/logs/v1    | _not implemented_      | NA                     | NA      |
 |log       |   HTTP    | OTLP/logs/v1    | _not implemented_      | NA                     | NA      |
@@ -54,7 +54,7 @@ Usage:
     go run . -i=INGEST -s=SCHEMA -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
 Options:
     -i  The INGEST type (trace, metrics, logs, events, rum)
-    -p  The request SCHEMA (zipkin, otlp, sapm, thrift)
+    -s  The request SCHEMA (zipkin, otlp, sapm, thrift, sfx)
     -t  TRANSPORT (http, grpc)
     -token  Ingest access TOKEN
     -url    The URL to ingest endpoint
