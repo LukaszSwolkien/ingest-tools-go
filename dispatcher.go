@@ -11,7 +11,7 @@ import (
 
 type dispatcherConfig struct {
 	ingest       string
-	protocol     string
+	schema     string
 	transport    string
 	token        string
 	ingestUrl    string
@@ -27,19 +27,19 @@ type dispatcher struct {
 }
 
 func (d *dispatcher) log_sample() {
-	switch d.config.protocol {
+	switch d.config.schema {
 	case "hec":
 		spl_event := logevent.GenerateLogSample()
 		content_type := "application/json"
 		log.Printf("Splunk Event Log format, Content-Type: %v", content_type)
 		shared.SendDataSample(d.config.ingestUrl, d.config.token, content_type, spl_event)
 	default:
-		log.Fatalf("Unsupported protocol %v", d.config.protocol)
+		log.Fatalf("Unsupported schema %v", d.config.schema)
 	}
 }
 
 func (d *dispatcher) metrics_sample() {
-	switch d.config.protocol {
+	switch d.config.schema {
 	case "sfx":
 		sfx_guage := metric.GenerateSfxGuageDatapointSample()
 		content_type := "application/json"
@@ -54,12 +54,12 @@ func (d *dispatcher) metrics_sample() {
 		otlp_metric := metric.GenerateOtlpMetric()
 		metric.SendGrpcOtlpMetricSample(*ingest, *token, *grpcInsecure, otlp_metric)
 	default:
-		log.Fatalf("Unsupported protocol %v", d.config.protocol)
+		log.Fatalf("Unsupported schema %v", d.config.schema)
 	}
 }
 
 func (d *dispatcher) trace_sample() {
-	switch d.config.protocol {
+	switch d.config.schema {
 	case "zipkin":
 		content_type := "application/json"
 		log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
@@ -75,7 +75,7 @@ func (d *dispatcher) trace_sample() {
 		otlpSpan := trace.GenerateSpan()
 		trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, *grpcInsecure, otlpSpan)
 	default:
-		log.Fatalf("Unsupported protocol %v", d.config.protocol)
+		log.Fatalf("Unsupported schema %v", d.config.schema)
 	}
 }
 
