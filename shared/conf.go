@@ -9,7 +9,7 @@ import (
 
 type Conf struct {
 	Ingest       string `yaml:"ingest"`
-	Schema       string `yaml:"protocol"`
+	Format       string `yaml:"data-format"`
 	Transport    string `yaml:"transport"`
 	Token        string `yaml:"token"`
 	IngestUrl    string `yaml:"url"`

@@ -11,7 +11,7 @@ import (
 
 type dispatcherConfig struct {
 	ingest       string
-	schema       string
+	format       string
 	transport    string
 	token        string
 	ingestUrl    string
@@ -27,19 +27,19 @@ type dispatcher struct {
 }
 
 func (d *dispatcher) log_sample() {
-	switch d.config.schema {
+	switch d.config.format {
 	case "hec":
 		spl_event := logevent.GenerateLogSample()
 		content_type := "application/json"
 		log.Printf("Splunk Event Log format, Content-Type: %v", content_type)
 		shared.SendData(d.config.ingestUrl, d.config.token, content_type, spl_event)
 	default:
-		log.Fatalf("Unsupported schema %v", d.config.schema)
+		log.Fatalf("Unsupported format %v", d.config.format)
 	}
 }
 
 func (d *dispatcher) metrics_sample() {
-	switch d.config.schema {
+	switch d.config.format {
 	case "sfx":
 		sfx_guage := metric.GenerateSfxGuageDatapointSample()
 		content_type := "application/json"
@@ -55,12 +55,12 @@ func (d *dispatcher) metrics_sample() {
 		metric.PostOtlpMetricSample(d.config.ingestUrl, *token, otlp_metric)
 		// metric.SendGrpcOtlpMetricSample(*ingest, *token, *grpcInsecure, otlp_metric)
 	default:
-		log.Fatalf("Unsupported schema %v", d.config.schema)
+		log.Fatalf("Unsupported format %v", d.config.format)
 	}
 }
 
 func (d *dispatcher) trace_sample() {
-	switch d.config.schema {
+	switch d.config.format {
 	case "zipkin":
 		content_type := "application/json"
 		log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
@@ -68,15 +68,21 @@ func (d *dispatcher) trace_sample() {
 		shared.SendData(d.config.ingestUrl, d.config.token, content_type, zipkin_data)
 	case "thrift":
 		content_type := "x-thrift"
+		// TODO: implement Jaeger
 		log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)
 	case "sapm":
 		content_type := "x-protobuf"
+		// TODO: implement SAPM 
 		log.Fatalf("SAPM format not implemented, Content-Type: %v", content_type)
 	case "otlp":
-		otlpSpan := trace.GenerateSpan()
-		trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, *grpcInsecure, otlpSpan)
+		if d.config.transport == "grpc"{
+			otlpSpan := trace.GenerateSpan()
+			trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, *grpcInsecure, otlpSpan)
+		} else{
+			log.Fatalf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)	
+		}
 	default:
-		log.Fatalf("Unsupported schema %v", d.config.schema)
+		log.Fatalf("Unsupported format %v", d.config.format)
 	}
 }
 
