@@ -72,14 +72,14 @@ func (d *dispatcher) trace_sample() {
 		log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)
 	case "sapm":
 		content_type := "x-protobuf"
-		// TODO: implement SAPM 
+		// TODO: implement SAPM
 		log.Fatalf("SAPM format not implemented, Content-Type: %v", content_type)
 	case "otlp":
-		if d.config.transport == "grpc"{
+		if d.config.transport == "grpc" {
 			otlpSpan := trace.GenerateSpan()
 			trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, *grpcInsecure, otlpSpan)
-		} else{
-			log.Fatalf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)	
+		} else {
+			log.Fatalf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)
 		}
 	default:
 		log.Fatalf("Unsupported format %v", d.config.format)

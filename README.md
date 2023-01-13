@@ -29,11 +29,13 @@ url: "ingest.REALM.signalfx.com:443"
 |log         |   HTTP    | Splunk HEC         | /v1/log                | application/json       | &check; |
 |profiling   |   HTTP    | OTLP/logs/v1       | /v1/log                | application/json       | &cross; |
 |log         |   HTTP    | Splunk HEC         | /services/collector    | application/json       | &cross; |
-|events      |   HTTP    | OTLP/logs/v1       | v3/events              | application/x-protobuf | &cross; |
-|events      |   HTTP    | SignalFx Event     | v2/events              | application/json       | &cross; |
-|rum         |   HTTP    | Zipkin JSON        | v1/rum                 | application/json       | &cross; |
-|rum         |   HTTP    | OTLP/logs/v1       | v1/rumreplay           | application/x-protobuf | &cross; |
-|rum         |   HTTP    | Zipkin JSON        | v1/rumreplay           | application/json       | &cross; |
+|events      |   HTTP    | OTLP/logs/v1       | /v3/events             | application/x-protobuf | &cross; |
+|events      |   HTTP    | SignalFx Event     | /v2/events             | application/json       | &cross; |
+|rum         |   HTTP    | Zipkin JSON        | /v1/rum                | application/json       | &cross; |
+|rum         |   HTTP    | OTLP/logs/v1       | /v1/rumreplay          | application/x-protobuf | &cross; |
+|rum         |   HTTP    | Zipkin JSON        | /v1/rumreplay          | application/json       | &cross; |
+
+note: rumtest has grpc (thrift) and evets have grpc !!! - todo: investigate.
 ## Data formats:
 
 * [OTLP proto files](https://github.com/open-telemetry/opentelemetry-proto/tree/main/opentelemetry/proto) 
