@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/LukaszSwolkien/IngestTools/shared"
-	yaml "gopkg.in/yaml.v3"
 	"os"
 	"testing"
+
+	"github.com/LukaszSwolkien/IngestTools/shared"
+	"github.com/LukaszSwolkien/IngestTools/ut"
+	yaml "gopkg.in/yaml.v3"
 )
 
 const (
@@ -22,40 +24,20 @@ var (
 	}
 )
 
-func checkErr(t *testing.T, err error) {
-	if err != nil {
-		t.Error(err)
-
-	}
-}
-
-func checkStr(t *testing.T, want string, result string) {
-	if want != result {
-		t.Errorf("Result is incorrect, got: %v, want: %v.", result, want)
-
-	}
-}
-
-func checkBool(t *testing.T, want bool, result bool) {
-	if want != result {
-		t.Errorf("Result is incorrect, got: %v, want: %v.", result, want)
-	}
-}
-
 func generateConfigFile(t *testing.T) {
 	c := conf
 
 	y, err := yaml.Marshal(c)
-	checkErr(t, err)
+	ut.Check(t, err)
 
 	err = os.WriteFile(confFile, []byte(y), 0644)
-	checkErr(t, err)
+	ut.Check(t, err)
 
 }
 
 func cleanup(t *testing.T) {
 	err := os.Remove(confFile)
-	checkErr(t, err)
+	ut.Check(t, err)
 	*ingest = ""
 	*ingestUrl = ""
 	*transport = ""
@@ -67,13 +49,12 @@ func TestLoadFullConfiguration(t *testing.T) {
 	defer cleanup(t)
 	generateConfigFile(t)
 	loadConfiguration(confFile)
-	checkStr(t, conf.Ingest, *ingest)
-	checkStr(t, conf.Format, *format)
-	checkStr(t, conf.IngestUrl, *ingestUrl)
-	checkStr(t, conf.Token, *token)
-	checkStr(t, conf.Transport, *transport)
-	checkBool(t, false, *grpcInsecure)
-
+	ut.AssertEqual(t, conf.Ingest, *ingest)
+	ut.AssertEqual(t, conf.Format, *format)
+	ut.AssertEqual(t, conf.IngestUrl, *ingestUrl)
+	ut.AssertEqual(t, conf.Token, *token)
+	ut.AssertEqual(t, conf.Transport, *transport)
+	ut.AssertEqual(t, false, *grpcInsecure)
 }
 
 func TestLoadConfigurationOverwrite(t *testing.T) {
@@ -85,9 +66,9 @@ func TestLoadConfigurationOverwrite(t *testing.T) {
 	*token = "overwrite"
 	*transport = "overwrite"
 	loadConfiguration(confFile)
-	checkStr(t, "overwrite", *ingest)
-	checkStr(t, "overwrite", *format)
-	checkStr(t, "overwrite", *ingestUrl)
-	checkStr(t, "overwrite", *token)
-	checkStr(t, "overwrite", *transport)
+	ut.AssertEqual(t, "overwrite", *ingest)
+	ut.AssertEqual(t, "overwrite", *format)
+	ut.AssertEqual(t, "overwrite", *ingestUrl)
+	ut.AssertEqual(t, "overwrite", *token)
+	ut.AssertEqual(t, "overwrite", *transport)
 }
