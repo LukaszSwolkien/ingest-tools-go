@@ -10,7 +10,7 @@ type Conf struct {
 
 type ServerCore struct {
 	Conf
-	signalChan   chan os.Signal
+	signalChan chan os.Signal
 	// TODO: add anything common to futher send data for debugging
 }
 

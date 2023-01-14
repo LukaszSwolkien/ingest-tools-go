@@ -17,4 +17,5 @@
 .vscode/
 .secrets.yaml
 .conf.yaml
+.coverage.out
 todo.notes

@@ -52,7 +52,7 @@ url: "ingest.REALM.signalfx.com:443"
 ingest tool needs following parameters to run:
 ```bash
 Usage:
-    go run . -i=INGEST -f=SCHEMA -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
+    go run . -i=INGEST -f=FORMAT -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
 Options:
     -i  The Ingest type (trace, metrics, logs, events, rum)
     -f  The request Data-Format (zipkin, otlp, sapm, thrift, sfx)
@@ -103,4 +103,10 @@ To connect with mock grpc service run on localhost use `grpc-insecure=true` flag
 
 ```
 go run . -i=trace -f=otlp -t=grpc -url=localhost:8201 -grpc-insecure=true
+```
+
+# Testing
+To run unit tests and check test coverage run below script
+```bash
+./test_cover.sh
 ```

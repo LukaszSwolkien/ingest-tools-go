@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/LukaszSwolkien/IngestTools/shared"
 	"log"
+
+	"github.com/LukaszSwolkien/IngestTools/shared"
 )
 
 var (

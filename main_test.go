@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -24,20 +26,16 @@ var (
 	}
 )
 
-func generateConfigFile(t *testing.T) {
+func generateConfigFile() {
 	c := conf
-
-	y, err := yaml.Marshal(c)
-	ut.Check(t, err)
-
-	err = os.WriteFile(confFile, []byte(y), 0644)
-	ut.Check(t, err)
-
+	y, _ := yaml.Marshal(c)
+	err := os.WriteFile(confFile, []byte(y), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func cleanup(t *testing.T) {
-	err := os.Remove(confFile)
-	ut.Check(t, err)
+func cleanup() {
 	*ingest = ""
 	*ingestUrl = ""
 	*transport = ""
@@ -45,9 +43,18 @@ func cleanup(t *testing.T) {
 	*grpcInsecure = false
 }
 
+func TestMain(m *testing.M) {
+	generateConfigFile()
+	exitVal := m.Run()
+	err := os.Remove(confFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	os.Exit(exitVal)
+}
+
 func TestLoadFullConfiguration(t *testing.T) {
-	defer cleanup(t)
-	generateConfigFile(t)
+	defer cleanup()
 	loadConfiguration(confFile)
 	ut.AssertEqual(t, conf.Ingest, *ingest)
 	ut.AssertEqual(t, conf.Format, *format)
@@ -58,8 +65,7 @@ func TestLoadFullConfiguration(t *testing.T) {
 }
 
 func TestLoadConfigurationOverwrite(t *testing.T) {
-	defer cleanup(t)
-	generateConfigFile(t)
+	defer cleanup()
 	*ingest = "overwrite"
 	*format = "overwrite"
 	*ingestUrl = "overwrite"
@@ -71,4 +77,13 @@ func TestLoadConfigurationOverwrite(t *testing.T) {
 	ut.AssertEqual(t, "overwrite", *ingestUrl)
 	ut.AssertEqual(t, "overwrite", *token)
 	ut.AssertEqual(t, "overwrite", *transport)
+}
+
+func TestMainFunc(t *testing.T) {
+	os.Args = append(os.Args, "-i=metrics")
+	os.Args = append(os.Args, "-f=sfx")
+	os.Args = append(os.Args, "-t=http")
+	os.Args = append(os.Args, fmt.Sprintf("-url=%v", svr.URL))
+	os.Args = append(os.Args, "-token=TOKEN")
+	main()
 }

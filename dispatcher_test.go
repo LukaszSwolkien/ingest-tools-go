@@ -1,68 +1,105 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/LukaszSwolkien/IngestTools/ut"
-	"github.com/LukaszSwolkien/IngestTools/cmd/mock/trace-server/server"
-	mock "github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
-	"sync"
-	"log"
-)
 
+	mock "github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
+	"github.com/LukaszSwolkien/IngestTools/cmd/mock/trace-server/server"
+	"github.com/LukaszSwolkien/IngestTools/ut"
+)
 
 var (
 	svr = httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	}))
-	tests = []dispatcherConfig{
-	{
-		ingest:       "logs",
-		ingestUrl:    svr.URL,
-		token:        "t0p_s3cr3t",
-		format:       "hec",
-		transport:    "http",
-	},
-	{
-		ingest:       "metrics",
-		ingestUrl:    svr.URL,
-		token:        "t0p_s3cr3t",
-		format:       "sfx",
-		transport:    "http",
-	},
-	{
-		ingest:       "metrics",
-		ingestUrl:    svr.URL,
-		token:        "t0p_s3cr3t",
-		format:       "otlp",
-		transport:    "http",
-	},
-	{
-		ingest:       "trace",
-		ingestUrl:    svr.URL,
-		token:        "t0p_s3cr3t",
-		format:       "zipkin",
-		transport:    "http",
-	},
-}
+		}))
+	testSupportedConf = []dispatcherConfig{
+		{
+			ingest:    "logs",
+			ingestUrl: svr.URL,
+			format:    "hec",
+			transport: "http",
+		},
+		{
+			ingest:    "metrics",
+			ingestUrl: svr.URL,
+			format:    "sfx",
+			transport: "http",
+		},
+		{
+			ingest:    "metrics",
+			ingestUrl: svr.URL,
+			format:    "otlp",
+			transport: "http",
+		},
+		{
+			ingest:    "trace",
+			ingestUrl: svr.URL,
+			format:    "zipkin",
+			transport: "http",
+		},
+	}
+
+	testUnsupportedConf = []dispatcherConfig{
+		{
+			ingest: "unknown",
+		},
+		{
+			ingest:    "metrics",
+			transport: "unknown",
+		},
+		{
+			ingest:    "metrics",
+			transport: "http",
+			format:    "unknown",
+		},
+		{
+			ingest:    "metrics",
+			transport: "unknown",
+			format:    "sfx",
+		},
+		{
+			ingest:    "logs",
+			transport: "unknown",
+		},
+		{
+			ingest:    "logs",
+			transport: "http",
+			format:    "unknown",
+		},
+		{
+			ingest:    "trace",
+			transport: "unknown",
+		},
+		{
+			ingest:    "trace",
+			transport: "http",
+			format:    "unknown",
+		},
+		{
+			ingest:    "trace",
+			transport: "grpc",
+			format:    "unknown",
+		},
+	}
 )
 
-func TestHttpCalls(t *testing.T) {
-	for _, c := range tests {
+func TestUnsupportedSamples(t *testing.T) {
+	for _, c := range testUnsupportedConf {
 		d := setup(c)
-		resp := d.dispatch()
-		ut.AssertTrue(t, resp == 200)
+		ret := d.dispatch()
+		ut.AssertTrue(t, ret == 400)
 	}
 }
-
-func asyncDo(t *testing.T, s *server.Server, f func()int, wg *sync.WaitGroup) {
-	defer s.Shutdown()
-	defer wg.Done()
-	log.Printf("asyncDo")
-	resp := f()
-	ut.AssertTrue(t, resp == 200)
-	log.Printf("assertTrue resp %v", resp)
+func TestSupportedHttpSamples(t *testing.T) {
+	for _, c := range testSupportedConf {
+		d := setup(c)
+		resp := d.dispatch()
+		log.Printf("%#v", c)
+		ut.AssertEqual(t, resp, 200)
+	}
 }
 
 func TestGrpcOtlpTrace(t *testing.T) {
@@ -72,18 +109,19 @@ func TestGrpcOtlpTrace(t *testing.T) {
 	})
 
 	d := setup(dispatcherConfig{
-		ingest: "trace",
-		format: "otlp",
-		ingestUrl: "localhost:8201",
-		token: "t0p_s3cr3t",
+		ingest:       "trace",
+		format:       "otlp",
+		ingestUrl:    "localhost:8201",
+		token:        "t0p_s3cr3t",
 		grpcInsecure: true,
-		transport: "grpc",
+		transport:    "grpc",
 	})
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go asyncDo(t, s, d.dispatch, &wg)
-	log.Printf("starting server")
 	go s.Main()
-	log.Printf("Waiting")
-	wg.Wait()
+	asyncDo(t, s, d.dispatch)
+}
+
+func asyncDo(t *testing.T, s *server.Server, f func() int) {
+	defer s.Shutdown()
+	resp := f()
+	ut.AssertTrue(t, resp == 200)
 }
