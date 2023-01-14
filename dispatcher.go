@@ -21,25 +21,26 @@ type dispatcherConfig struct {
 type dispatcher struct {
 	config dispatcherConfig
 
-	commands	map[string]func()
+	commands	map[string]func()int
 }
 
-func addCommand(commands map[string]func(), cmd string, action func()) {
+func addCommand(commands map[string]func()int, cmd string, action func()int) {
 	commands[cmd] = action
 }
 
-func dispatchCommand(commands	map[string]func(), cmd string) {
+func dispatchCommand(commands	map[string]func()int, cmd string) int {
 	if f, ok := commands[cmd]; ok {
-		f()
+		return f()
 	} else {
 		log.Fatalln("Unsupported command")
+		return 404
 	}
 }
 
 func setup(conf dispatcherConfig) *dispatcher {
 	d := &dispatcher{config: conf}
-	d.commands = make(map[string]func())
-	addCommand(d.commands, "log", d.log_sample)
+	d.commands = make(map[string]func()int)
+	addCommand(d.commands, "logs", d.logs_sample)
 	addCommand(d.commands, "metrics", d.metrics_sample)
 	addCommand(d.commands, "trace", d.trace_sample)
 	addCommand(d.commands, "rum", d.rum_sample)
@@ -48,8 +49,8 @@ func setup(conf dispatcherConfig) *dispatcher {
 	return d
 }
 
-func (d *dispatcher) dispatch() {
-	dispatchCommand(d.commands, d.config.ingest)
+func (d *dispatcher) dispatch() int {
+	return dispatchCommand(d.commands, d.config.ingest)
 }
 
 func notImplementedSample(conf dispatcherConfig){
@@ -61,96 +62,106 @@ func unsupportedDataFormat(conf dispatcherConfig){
 }
 
 // ---- rum samples ----
-func (d *dispatcher) rum_sample() {
+func (d *dispatcher) rum_sample() int {
 	// TODO
 	notImplementedSample(d.config)
+	return 404
 }
 // ---- events samples ----
-func (d *dispatcher) events_sample() {
+func (d *dispatcher) events_sample() int{
 	// TODO
 	notImplementedSample(d.config)
+	return 404
+
 }
 // ---- profiling samples ----
-func (d *dispatcher) profiling_sample() {
+func (d *dispatcher) profiling_sample() int{
 	// TODO
 	notImplementedSample(d.config)
+	return 404
 }
 // ---- log samples ----
-func (d *dispatcher) log_sample() {
+func (d *dispatcher) logs_sample() int{
 	switch d.config.format {
 	case "hec":
-		log_hec_sample(d.config)
+		return httpHeclogs(d.config)
 	default:
 		unsupportedDataFormat(d.config)
 	}
+	return 404
 }
-func log_hec_sample(conf dispatcherConfig) {
+func httpHeclogs(conf dispatcherConfig) int {
 	spl_event := logevent.GenerateLogSample()
 	content_type := "application/json"
 	log.Printf("Splunk Event Log format, Content-Type: %v", content_type)
-	shared.SendData(conf.ingestUrl, conf.token, content_type, spl_event)
+	return shared.SendData(conf.ingestUrl, conf.token, content_type, spl_event)
 }
 // ---- metrics samples ----
-func (d *dispatcher) metrics_sample() {
+func (d *dispatcher) metrics_sample() int {
 	switch d.config.format {
 	case "sfx":
-		httpSfxMetrics(d.config)
+		return httpSfxMetrics(d.config)
 	case "otlp":
-		httpOtlpMetrics(d.config)
+		return httpOtlpMetrics(d.config)
 	default:
 		unsupportedDataFormat(d.config)
 	}
+	return 404
 }
-func httpOtlpMetrics(conf dispatcherConfig) {
+func httpOtlpMetrics(conf dispatcherConfig) int {
 	otlp_metric := metric.GenerateOtlpMetric()
-	metric.PostOtlpMetricSample(conf.ingestUrl, *token, otlp_metric)
+	return metric.PostOtlpMetricSample(conf.ingestUrl, *token, otlp_metric)
 }
-func httpSfxMetrics(conf dispatcherConfig) {
+func httpSfxMetrics(conf dispatcherConfig) int {
 	sfx_guage := metric.GenerateSfxGuageDatapointSample()
 	content_type := "application/json"
 	log.Printf("SignalFx Datapoint format, Content-Type: %v", content_type)
-	shared.SendData(conf.ingestUrl, conf.token, content_type, sfx_guage)
+	r := shared.SendData(conf.ingestUrl, conf.token, content_type, sfx_guage)
 	for i := 0; i < 3; i++ {
 		time.Sleep(time.Second)
 		sfx_counter := metric.GenerateSfxCounterDatapointSample()
-		shared.SendData(conf.ingestUrl, conf.token, content_type, sfx_counter)
+		r = shared.SendData(conf.ingestUrl, conf.token, content_type, sfx_counter)
 	}
+	return r
 }
 // ---- trace samples ----
-func (d *dispatcher) trace_sample() {
+func (d *dispatcher) trace_sample() int {
 	switch d.config.format {
 	case "zipkin":
-		httpZipkinTrace(d.config)
-	case "thrift":
-		thriftJaegerTrace(d.config)
-	case "sapm":
-		httpSapmTrace(d.config)
+		return httpZipkinTrace(d.config)
+	// case "thrift":
+	// 	return thriftJaegerTrace(d.config)
+	// case "sapm":
+	// 	return httpSapmTrace(d.config)
 	case "otlp":
 		if d.config.transport == "grpc" {
-			grpcOtlpTrace(d.config)
+			return grpcOtlpTrace(d.config)
 		}else {
 			log.Fatalf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)
 		}
 	default:
 		unsupportedDataFormat(d.config)
 	}
+	return 404
 }
-func grpcOtlpTrace(conf dispatcherConfig) {
+func grpcOtlpTrace(conf dispatcherConfig) int {
 		otlpSpan := trace.GenerateSpan()
-		trace.SendGrpcOtlpTraceSample(conf.ingestUrl, conf.token, *grpcInsecure, otlpSpan)
+		return trace.SendGrpcOtlpTraceSample(conf.ingestUrl, conf.token, conf.grpcInsecure, otlpSpan)
 } 
-func httpSapmTrace(conf dispatcherConfig) {
+func httpSapmTrace(conf dispatcherConfig) int {
 	content_type := "x-protobuf"
 	log.Fatalf("SAPM format not implemented, Content-Type: %v", content_type)
+	return 501
 }
-func thriftJaegerTrace(conf dispatcherConfig) {
+func thriftJaegerTrace(conf dispatcherConfig) int {
 	// TODO: implement Jaeger
 	content_type := "x-thrift"
 	log.Fatalf("Jaeger Thrift format not implemented, Content-Type: %v", content_type)
+	return 501
 }
-func httpZipkinTrace(conf dispatcherConfig) {
+func httpZipkinTrace(conf dispatcherConfig) int {
 	content_type := "application/json"
 	log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
 	var zipkin_data = trace.GenerateZipkinSample()
-	shared.SendData(conf.ingestUrl, conf.token, content_type, zipkin_data)
+	return shared.SendData(conf.ingestUrl, conf.token, content_type, zipkin_data)
 }

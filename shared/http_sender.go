@@ -10,7 +10,7 @@ import (
 )
 
 // Converts data structure into json and sends to ingest
-func SendData(url string, secret string, contentType string, data interface{}) {
+func SendData(url string, secret string, contentType string, data interface{}) int {
 	json_data, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		log.Fatalf("Marshal: %v", err)
@@ -18,11 +18,10 @@ func SendData(url string, secret string, contentType string, data interface{}) {
 	log.Println("Sending sample data:\n" + string(json_data))
 
 	body := bytes.NewBuffer(json_data)
-	PostHttpRequest(url, secret, contentType, body)
-
+	return PostHttpRequest(url, secret, contentType, body)
 }
 
-func PostHttpRequest(url string, secret string, contentType string, body io.Reader) {
+func PostHttpRequest(url string, secret string, contentType string, body io.Reader) int {
 	r, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		log.Fatalln(err)
@@ -42,4 +41,5 @@ func PostHttpRequest(url string, secret string, contentType string, body io.Read
 		log.Fatalln(err)
 	}
 	log.Println(string(dr))
+	return resp.StatusCode
 }

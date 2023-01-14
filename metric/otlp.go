@@ -99,8 +99,8 @@ func SendGrpcOtlpMetricSample(url string, secret string, grpcInsecure bool, metr
 	}
 }
 
-func PostOtlpMetricSample(url string, secret string, metrics *metric.Metric) {
-	log.Printf("url: %v, secret: %v", url, secret)
+func PostOtlpMetricSample(url string, secret string, metrics *metric.Metric) int {
+	// log.Printf("url: %v, secret: %v", url, secret)
 	d := &metricSvc.ExportMetricsServiceRequest{ResourceMetrics: getResourceMetric(metrics)}
 
 	b, err := proto.Marshal(d)
@@ -109,5 +109,5 @@ func PostOtlpMetricSample(url string, secret string, metrics *metric.Metric) {
 	}
 
 	data := bytes.NewBuffer(b)
-	shared.PostHttpRequest(url, secret, "application/x-protobuf", data)
+	return shared.PostHttpRequest(url, secret, "application/x-protobuf", data)
 }

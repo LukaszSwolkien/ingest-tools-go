@@ -2,9 +2,6 @@ package main
 
 import (
 	"flag"
-	"os/signal"
-	"syscall"
-
 	core "github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
 	"github.com/LukaszSwolkien/IngestTools/cmd/mock/trace-server/server"
 )
@@ -20,6 +17,5 @@ func main() {
 		GrpcPort:    uint16(*port),
 	})
 
-	signal.Notify(s.SignalChan(), syscall.SIGTERM, syscall.SIGINT)
 	s.Main()
 }
