@@ -59,7 +59,7 @@ func GetResourceSpans(span *trace.Span) []*trace.ResourceSpans {
 	}
 }
 
-func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, span *trace.Span) {
+func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, span *trace.Span) int {
 	resSpans := GetResourceSpans(span)
 	data := &traceSvc.ExportTraceServiceRequest{ResourceSpans: resSpans}
 	conn, err := shared.GrpcConnection(url, grpcInsecure)
@@ -75,12 +75,15 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, span 
 	rs, err := c.Export(ctx, data, grpc.PerRPCCredentials(auth))
 	if err != nil {
 		log.Fatalf("Server error: %v", err)
+		return 500
 	}
 	partialSuccess := rs.GetPartialSuccess()
 	if partialSuccess != nil {
 		log.Printf("Rejected spans %v", partialSuccess.ErrorMessage)
+		return 206
 
 	} else {
 		log.Printf("Request fully accepted")
+		return 200
 	}
 }
