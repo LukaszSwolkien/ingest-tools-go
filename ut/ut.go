@@ -22,5 +22,3 @@ func Check(t *testing.T, err error) {
 		t.Error(err)
 	}
 }
-
-

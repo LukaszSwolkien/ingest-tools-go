@@ -13,7 +13,8 @@ import (
 func SendData(url string, secret string, contentType string, data interface{}) int {
 	json_data, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
-		log.Fatalf("Marshal: %v", err)
+		log.Printf("Marshal: %v", err)
+		return 400
 	}
 	log.Println("Sending sample data:\n" + string(json_data))
 
