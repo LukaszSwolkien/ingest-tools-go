@@ -121,8 +121,8 @@ func (d *dispatcher) httpTraceSample() int {
 		return d.httpSfxTrace()
 	case "zipkin":
 		return d.httpZipkinTrace()
-	// case "thrift":
-	// 	return d.thriftJaegerTrace()
+	case "jaegerthrift":
+		return d.thriftJaegerTrace()
 	case "sapm":
 		return d.httpSapmTrace()
 	case "otlp":
@@ -156,15 +156,15 @@ func (d *dispatcher) traceSample() int {
 	return 400
 }
 func (d *dispatcher) grpcOtlpTrace() int {
-	otlpSpan := trace.GenerateOtlpSpan()
-	return trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, d.config.grpcInsecure, otlpSpan)
+	sample := trace.GenerateOtlpSpan()
+	return trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, d.config.grpcInsecure, sample)
 }
 
 func (d *dispatcher) httpZipkinTrace() int {
 	content_type := "application/json"
 	log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
-	var zipkin_data = trace.GenerateZipkinSample()
-	return shared.SendJsonData(d.config.ingestUrl, d.config.token, content_type, zipkin_data)
+	sample := trace.GenerateZipkinSample()
+	return shared.SendJsonData(d.config.ingestUrl, d.config.token, content_type, sample)
 }
 
 func (d *dispatcher) httpSfxTrace() int {
@@ -175,13 +175,20 @@ func (d *dispatcher) httpSfxTrace() int {
 func (d *dispatcher) httpOtlpTrace() int {
 	content_type := "application/x-protobuf"
 	log.Printf("OTLP protobuf format, Content-Type: %v", content_type)
-	otlpSpan := trace.GenerateOtlpSpan()
-	return trace.SendHttpOtlpSample(d.config.ingestUrl, d.config.token, content_type, otlpSpan)
+	sample := trace.GenerateOtlpSpan()
+	return trace.SendHttpOtlpSample(d.config.ingestUrl, d.config.token, content_type, sample)
 }
 
 func (d *dispatcher) httpSapmTrace() int {
 	content_type := "application/x-protobuf"
 	log.Printf("SAPM protobuf format, Content-Type: %v", content_type)
-	sapmBatch := trace.GenerateSapmSpan()
-	return trace.SendHttpSapmSample(d.config.ingestUrl, d.config.token, content_type, sapmBatch)
+	sample := trace.GenerateSapmSpan()
+	return trace.SendHttpSapmSample(d.config.ingestUrl, d.config.token, content_type, sample)
+}
+
+func (d *dispatcher) thriftJaegerTrace() int {
+	content_type := "application/x-thrift"
+	log.Printf("JaegerThrift format, Content-Type: %v", content_type)
+	sample := trace.GenerateJeagerThriftSample()
+	return trace.SendHttpJaegerThriftSample(d.config.ingestUrl, d.config.token, content_type, sample)
 }

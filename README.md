@@ -23,17 +23,17 @@ url: "ingest.REALM.signalfx.com:443"
 |trace       |   HTTP    | Zipkin JSON        | /v2/trace              | application/json       | &check; |
 |trace       |   HTTP    | SignalFx Trace     | /v2/trace/signalfxv1   | application/json       | &check; |
 |trace       |   HTTP    | SAPM               | /v2/trace/sapm         | application/x-protobuf | &check; |
-|trace       |   HTTP    | JaegerThrift       | /v2/trace/jeagerthrift | application/x-thrift   | &cross; |
+|trace       |   HTTP    | JaegerThrift       | /v2/trace/jeagerthrift | application/x-thrift   |         |
 |metrics     |   HTTP    | OTLP/metrics/v1    | /v2/datapoint/otlp     | application/x-protobuf | &check; |
 |metrics     |   HTTP    | SignalFx Datapoint | /v2/datapoint          | application/json       | &check; |
 |log         |   HTTP    | Splunk HEC         | /v1/log                | application/json       | &check; |
-|profiling   |   HTTP    | OTLP/logs/v1       | /v1/log                | application/json       | &cross; |
-|log         |   HTTP    | Splunk HEC         | /services/collector    | application/json       | &cross; |
-|events      |   HTTP    | OTLP/logs/v1       | /v3/events             | application/x-protobuf | &cross; |
-|events      |   HTTP    | SignalFx Event     | /v2/events             | application/json       | &cross; |
-|rum         |   HTTP    | Zipkin JSON        | /v1/rum                | application/json       | &cross; |
-|rum         |   HTTP    | OTLP/logs/v1       | /v1/rumreplay          | application/x-protobuf | &cross; |
-|rum         |   HTTP    | Zipkin JSON        | /v1/rumreplay          | application/json       | &cross; |
+|profiling   |   HTTP    | OTLP/logs/v1       | /v1/log                | application/json       |         |
+|log         |   HTTP    | Splunk HEC         | /services/collector    | application/json       |         |
+|events      |   HTTP    | OTLP/logs/v1       | /v3/events             | application/x-protobuf |         |
+|events      |   HTTP    | SignalFx Event     | /v2/events             | application/json       |         |
+|rum         |   HTTP    | Zipkin JSON        | /v1/rum                | application/json       |         |
+|rum         |   HTTP    | OTLP/logs/v1       | /v1/rumreplay          | application/x-protobuf |         |
+|rum         |   HTTP    | Zipkin JSON        | /v1/rumreplay          | application/json       |         |
 
 
 ## Data formats:
@@ -55,7 +55,7 @@ Usage:
     go run . -i=INGEST -f=FORMAT -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
 Options:
     -i  The Ingest type (trace, metrics, logs, events, rum)
-    -f  The request Data-Format (zipkin, otlp, sapm, thrift, sfx)
+    -f  The request Data-Format (zipkin, otlp, sapm, jaegerthrift, sfx)
     -t  Transport (http, grpc)
     -token  Ingest access TOKEN
     -url    The URL to ingest endpoint

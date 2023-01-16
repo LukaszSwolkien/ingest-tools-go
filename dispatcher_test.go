@@ -58,6 +58,12 @@ var (
 			format:    "sapm",
 			transport: "http",
 		},
+		{
+			ingest:    "trace",
+			ingestUrl: svr.URL,
+			format:    "jaegerthrift",
+			transport: "http",
+		},
 	}
 
 	testUnsupportedConf = []dispatcherConfig{
