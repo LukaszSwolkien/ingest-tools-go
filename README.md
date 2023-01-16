@@ -55,7 +55,7 @@ Usage:
     go run . -i=INGEST -f=FORMAT -t=TRANSPORT -url=URL -token=TOKEN [grpc-insecure=false]
 Options:
     -i  The Ingest type (trace, metrics, logs, events, rum)
-    -f  The request Data-Format (zipkin, otlp, sapm, thrift, sfx)
+    -f  The request Data-Format (zipkin, otlp, sapm, jaegerthrift, sfx)
     -t  Transport (http, grpc)
     -token  Ingest access TOKEN
     -url    The URL to ingest endpoint

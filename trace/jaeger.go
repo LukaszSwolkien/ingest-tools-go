@@ -1,11 +1,15 @@
 package trace
 
 import (
+	"context"
 	jaegerThrift "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
+	"github.com/apache/thrift/lib/go/thrift"
 	"encoding/json"
 	"log"
+	"bytes"
+	"github.com/LukaszSwolkien/IngestTools/shared"
 )
-func GenerateJeagerSample() jaegerThrift.Batch {
+func GenerateJeagerThriftSample() *jaegerThrift.Batch {
 // test data copied from https://github.com/jaegertracing/jaeger/blob/master/model/converter/thrift/jaeger/fixtures/thrift_batch_01.json
 jaegerJSON := `
 				{
@@ -108,7 +112,15 @@ jaegerJSON := `
 	var batch jaegerThrift.Batch
 	json.Unmarshal([]byte(jaegerJSON), &batch)
 	log.Printf("batch data %v type of %T", batch, batch)
-	return batch
+	return &batch
 }
 
-// TODO: write SendHttpJaegerSample (thrift over http)
+func SendHttpJaegerThriftSample(url string, secret string, contentType string, sample *jaegerThrift.Batch) int {
+	bb, err := thrift.NewTSerializer().Write(context.Background(), sample)
+	if err != nil {
+		log.Printf("Marshal: %v", err)
+		return 400
+	}
+	body := bytes.NewBuffer(bb)
+	return shared.PostHttpRequest(url, secret, contentType, body)
+}
