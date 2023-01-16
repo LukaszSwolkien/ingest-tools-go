@@ -10,7 +10,7 @@ import (
 )
 
 // Converts data structure into json and sends to ingest
-func SendData(url string, secret string, contentType string, data interface{}) int {
+func SendJsonData(url string, secret string, contentType string, data interface{}) int {
 	json_data, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		log.Printf("Marshal: %v", err)
