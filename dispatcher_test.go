@@ -46,6 +46,18 @@ var (
 			format:    "otlp",
 			transport: "http",
 		},
+		{
+			ingest:    "trace",
+			ingestUrl: svr.URL,
+			format:    "sfx",
+			transport: "http",
+		},
+		{
+			ingest:    "trace",
+			ingestUrl: svr.URL,
+			format:    "sapm",
+			transport: "http",
+		},
 	}
 
 	testUnsupportedConf = []dispatcherConfig{

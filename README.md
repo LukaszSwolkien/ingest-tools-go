@@ -22,7 +22,7 @@ url: "ingest.REALM.signalfx.com:443"
 |trace       |   HTTP    | OTLP/trace/v1      | /v2/trace/otlp         | application/x-protobuf | &check; |
 |trace       |   HTTP    | Zipkin JSON        | /v2/trace              | application/json       | &check; |
 |trace       |   HTTP    | SignalFx Trace     | /v2/trace/signalfxv1   | application/json       | &check; |
-|trace       |   HTTP    | SAPM               | /v2/trace/sapm         | application/x-protobuf | &cross; |
+|trace       |   HTTP    | SAPM               | /v2/trace/sapm         | application/x-protobuf | &check; |
 |trace       |   HTTP    | JaegerThrift       | /v2/trace/jeagerthrift | application/x-thrift   | &cross; |
 |metrics     |   HTTP    | OTLP/metrics/v1    | /v2/datapoint/otlp     | application/x-protobuf | &check; |
 |metrics     |   HTTP    | SignalFx Datapoint | /v2/datapoint          | application/json       | &check; |
