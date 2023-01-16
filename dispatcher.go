@@ -117,17 +117,18 @@ func (d *dispatcher) httpSfxMetrics() int {
 
 func (d *dispatcher) httpTraceSample() int {
 	switch d.config.format {
+	case "sfx":
+		return d.httpSfxTrace()
 	case "zipkin":
 		return d.httpZipkinTrace()
 	// case "thrift":
 	// 	return d.thriftJaegerTrace()
-	// case "sapm":
-	// 	return d.httpSapmTrace()
+	case "sapm":
+		return d.httpSapmTrace()
 	case "otlp":
 		return d.httpOtlpTrace()
-	// log.Printf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
@@ -137,7 +138,7 @@ func (d *dispatcher) grpcTraceSample() int {
 	case "otlp":
 		return d.grpcOtlpTrace()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
@@ -150,12 +151,12 @@ func (d *dispatcher) traceSample() int {
 	case "grpc":
 		return d.grpcTraceSample()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
 func (d *dispatcher) grpcOtlpTrace() int {
-	otlpSpan := trace.GenerateSpan()
+	otlpSpan := trace.GenerateOtlpSpan()
 	return trace.SendGrpcOtlpTraceSample(d.config.ingestUrl, d.config.token, d.config.grpcInsecure, otlpSpan)
 }
 
@@ -166,9 +167,21 @@ func (d *dispatcher) httpZipkinTrace() int {
 	return shared.SendJsonData(d.config.ingestUrl, d.config.token, content_type, zipkin_data)
 }
 
+func (d *dispatcher) httpSfxTrace() int {
+	// Sfx format == Zipkin
+	return d.httpZipkinTrace()
+}
+
 func (d *dispatcher) httpOtlpTrace() int {
 	content_type := "application/x-protobuf"
 	log.Printf("OTLP protobuf format, Content-Type: %v", content_type)
-	otlpSpan := trace.GenerateSpan()
+	otlpSpan := trace.GenerateOtlpSpan()
 	return trace.SendHttpOtlpSample(d.config.ingestUrl, d.config.token, content_type, otlpSpan)
+}
+
+func (d *dispatcher) httpSapmTrace() int {
+	content_type := "application/x-protobuf"
+	log.Printf("SAPM protobuf format, Content-Type: %v", content_type)
+	sapmBatch := trace.GenerateSapmSpan()
+	return trace.SendHttpSapmSample(d.config.ingestUrl, d.config.token, content_type, sapmBatch)
 }

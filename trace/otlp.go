@@ -3,22 +3,24 @@ package trace
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"log"
 	"math/rand"
 	"time"
+
+	"google.golang.org/grpc"
 
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 
 	"github.com/LukaszSwolkien/IngestTools/shared"
 
 	"bytes"
+
 	"github.com/golang/protobuf/proto"
 	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1" // OTLP trace service
 	trace "go.opentelemetry.io/proto/otlp/trace/v1"              // OTLP traces data representation
 )
 
-func GenerateSpan() *trace.Span {
+func GenerateOtlpSpan() *trace.Span {
 	now := uint64(time.Now().UnixNano())
 
 	start := now
