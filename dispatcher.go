@@ -117,6 +117,8 @@ func (d *dispatcher) httpSfxMetrics() int {
 
 func (d *dispatcher) httpTraceSample() int {
 	switch d.config.format {
+	case "sfx":
+		return d.httpZipkinTrace()
 	case "zipkin":
 		return d.httpZipkinTrace()
 	// case "thrift":
@@ -125,9 +127,8 @@ func (d *dispatcher) httpTraceSample() int {
 	// 	return d.httpSapmTrace()
 	case "otlp":
 		return d.httpOtlpTrace()
-	// log.Printf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
@@ -137,7 +138,7 @@ func (d *dispatcher) grpcTraceSample() int {
 	case "otlp":
 		return d.grpcOtlpTrace()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
@@ -150,7 +151,7 @@ func (d *dispatcher) traceSample() int {
 	case "grpc":
 		return d.grpcTraceSample()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
