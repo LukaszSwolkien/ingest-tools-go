@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	logevent "github.com/LukaszSwolkien/IngestTools/log"
 	"github.com/LukaszSwolkien/IngestTools/metric"
 	"github.com/LukaszSwolkien/IngestTools/shared"
 	"github.com/LukaszSwolkien/IngestTools/trace"
-	"log"
 )
 
 type dispatcherConfig struct {
@@ -72,7 +73,7 @@ func (d *dispatcher) httpHeclogs() int {
 	spl_event := logevent.GenerateLogSample()
 	content_type := "application/json"
 	log.Printf("Splunk Event Log format, Content-Type: %v", content_type)
-	return shared.SendData(d.config.ingestUrl, d.config.token, content_type, spl_event)
+	return shared.SendJsonData(d.config.ingestUrl, d.config.token, content_type, spl_event)
 }
 
 // ---- metrics samples ----
@@ -105,7 +106,7 @@ func (d *dispatcher) httpSfxMetrics() int {
 	sfx_guage := metric.GenerateSfxGuageDatapointSample()
 	content_type := "application/json"
 	log.Printf("SignalFx Datapoint format, Content-Type: %v", content_type)
-	r := shared.SendData(d.config.ingestUrl, d.config.token, content_type, sfx_guage)
+	r := shared.SendJsonData(d.config.ingestUrl, d.config.token, content_type, sfx_guage)
 	// for i := 0; i < 3; i++ {
 	// 	time.Sleep(time.Second)
 	// 	sfx_counter := metric.GenerateSfxCounterDatapointSample()
@@ -122,7 +123,8 @@ func (d *dispatcher) httpTraceSample() int {
 	// 	return d.thriftJaegerTrace()
 	// case "sapm":
 	// 	return d.httpSapmTrace()
-	// case "otlp":
+	case "otlp":
+		return d.httpOtlpTrace()
 	// log.Printf("'%v' data-format over '%v' not implemented", d.config.format, d.config.transport)
 	default:
 		log.Printf(unsupportedDataFormat(d.config))
@@ -161,5 +163,12 @@ func (d *dispatcher) httpZipkinTrace() int {
 	content_type := "application/json"
 	log.Printf("Zipkin JSON format, Content-Type: %v", content_type)
 	var zipkin_data = trace.GenerateZipkinSample()
-	return shared.SendData(d.config.ingestUrl, d.config.token, content_type, zipkin_data)
+	return shared.SendJsonData(d.config.ingestUrl, d.config.token, content_type, zipkin_data)
+}
+
+func (d *dispatcher) httpOtlpTrace() int {
+	content_type := "application/x-protobuf"
+	log.Printf("OTLP protobuf format, Content-Type: %v", content_type)
+	otlpSpan := trace.GenerateSpan()
+	return trace.SendHttpOtlpSample(d.config.ingestUrl, d.config.token, content_type, otlpSpan)
 }

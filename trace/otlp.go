@@ -12,6 +12,8 @@ import (
 
 	"github.com/LukaszSwolkien/IngestTools/shared"
 
+	"bytes"
+	"github.com/golang/protobuf/proto"
 	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1" // OTLP trace service
 	trace "go.opentelemetry.io/proto/otlp/trace/v1"              // OTLP traces data representation
 )
@@ -81,9 +83,20 @@ func SendGrpcOtlpTraceSample(url string, secret string, grpcInsecure bool, span 
 	if partialSuccess != nil {
 		log.Printf("Rejected spans %v", partialSuccess.ErrorMessage)
 		return 206
-
 	} else {
 		log.Printf("Request fully accepted")
 		return 200
 	}
+}
+
+func SendHttpOtlpSample(url string, secret string, contentType string, span *trace.Span) int {
+	resSpans := GetResourceSpans(span)
+	data := &traceSvc.ExportTraceServiceRequest{ResourceSpans: resSpans}
+	message, err := proto.Marshal(data)
+	if err != nil {
+		log.Printf("Marshal: %v", err)
+		return 400
+	}
+	body := bytes.NewBuffer(message)
+	return shared.PostHttpRequest(url, secret, contentType, body)
 }

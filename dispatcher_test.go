@@ -40,6 +40,12 @@ var (
 			format:    "zipkin",
 			transport: "http",
 		},
+		{
+			ingest:    "trace",
+			ingestUrl: svr.URL,
+			format:    "otlp",
+			transport: "http",
+		},
 	}
 
 	testUnsupportedConf = []dispatcherConfig{

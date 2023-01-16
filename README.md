@@ -19,7 +19,7 @@ url: "ingest.REALM.signalfx.com:443"
 |Ingest type | Transport | Data-Format        | Endpoint               | Content-Type           | Sample  |
 |------------|-----------|--------------------|------------------------|------------------------|---------|
 |trace       |   gRPC    | OTLP/trace/v1      | (port:443)             | application/grpc       | &check; |
-|trace       |   HTTP    | OTLP/trace/v1      | /v2/trace/otlp         | application/x-protobuf | &cross; |
+|trace       |   HTTP    | OTLP/trace/v1      | /v2/trace/otlp         | application/x-protobuf | &check; |
 |trace       |   HTTP    | Zipkin JSON        | /v2/trace              | application/json       | &check; |
 |trace       |   HTTP    | SAPM               | /v2/trace/sapm         | application/x-protobuf | &cross; |
 |trace       |   HTTP    | SignalFx Trace     | /v2/trace/signalfxv1   | application/json       | &cross; |
