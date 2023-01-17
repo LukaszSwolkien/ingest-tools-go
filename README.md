@@ -47,7 +47,7 @@ url: "ingest.REALM.signalfx.com:443"
 * [Splunk HEC](https://docs.splunk.com/Documentation/Splunk/latest/Data/FormatEventsforHTTPEventCollector)
 * [Jaeger](https://www.jaegertracing.io/docs/1.41/apis/)
 
-# Usage
+# Main Usage
 
 ingest tool needs following parameters to run:
 ```bash
@@ -88,6 +88,28 @@ go run . -i=metrics -f=otlp -t=http -url=https://ingest.REALM.signalfx.com/v2/da
 * Splunk HEC/HTTP log sample:
 ```bash
 go run . -i=log -f=hec -t=http -url=https://ingest.REALM.signalfx.com/v1/logs -token=TOKEN
+```
+# Sampler
+
+Instead of sending samples directly to the endpoint you can serialise payload to the file and use curl for http requests. To do that you need to generate payload for a given data format. 
+
+sampler tool needs following parameters to run:
+```bash
+Usage:
+    go run ./cmd/sampler -f=FORMAT -file=FILENAME
+Options:
+    -f      The request Data-Format (zipkin, otlp, sapm, jaegerthrift, sfx,...)
+    -file   Output file name for payload data (default: payload.data)
+```
+
+* Example for Jaeger Thrift data format over http:
+
+```bash
+ go run ./cmd/sampler -f="jaegerthrift" --file="payload.data"
+```
+than use curl to post http request with binary data:
+```
+curl -X POST https://ingest.REALM.signalfx.com/v2/trace -H "Content-Type: application/x-thrift" -H "X-SF-Token: ACCESS_TOKEN" --data-binary @payload.data -i
 ```
 
 # Mock ingest services

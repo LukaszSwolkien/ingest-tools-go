@@ -24,6 +24,7 @@ func SendJsonData(url string, secret string, contentType string, data interface{
 
 func PostHttpRequest(url string, secret string, contentType string, body io.Reader) int {
 	r, err := http.NewRequest("POST", url, body)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
