@@ -9,7 +9,7 @@ import (
 
 var (
 	ingest       = flag.String("i", "", "ingest type (trace, metrics, logs, events, rum...)")
-	format       = flag.String("f", "", "The request data format (zipkin, otlp, sapm, thrift)")
+	format       = flag.String("f", "", "The request data format (zipkin, otlp, sapm, jaegerthrift)")
 	transport    = flag.String("t", "", "Transport (http, grpc)")
 	token        = flag.String("token", "", "Ingest access token")
 	ingestUrl    = flag.String("url", "", "The URL to ingest endpoint")

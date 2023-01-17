@@ -190,5 +190,5 @@ func (d *dispatcher) thriftJaegerTrace() int {
 	content_type := "application/x-thrift"
 	log.Printf("JaegerThrift format, Content-Type: %v", content_type)
 	sample := trace.GenerateJeagerThriftSample()
-	return trace.SendHttpJaegerThriftSample(d.config.ingestUrl, d.config.token, content_type, sample)
+	return trace.SendHttpJaegerThriftSample(d.config.ingestUrl, d.config.token, content_type, &sample)
 }
