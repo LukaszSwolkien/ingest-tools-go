@@ -96,8 +96,9 @@ Instead of sending samples directly to the endpoint you can serialise payload to
 sampler tool needs following parameters to run:
 ```bash
 Usage:
-    go run ./cmd/sampler -f=FORMAT -file=FILENAME
+    go run ./cmd/sampler -i=INGEST -f=FORMAT -file=FILENAME
 Options:
+    -i      The Ingest type (trace, metrics, logs, events, rum)
     -f      The request Data-Format (zipkin, otlp, sapm, jaegerthrift, sfx,...)
     -file   Output file name for payload data (default: payload.data)
 ```
@@ -105,7 +106,7 @@ Options:
 * Example for Jaeger Thrift data format over http:
 
 ```bash
- go run ./cmd/sampler -f="jaegerthrift" --file="payload.data"
+ go run ./cmd/sampler -i="trace" -f="jaegerthrift" -file="payload.data"
 ```
 than use curl to post http request with binary data:
 ```
