@@ -96,8 +96,9 @@ Instead of sending samples directly to the endpoint you can serialise payload to
 sampler tool needs following parameters to run:
 ```bash
 Usage:
-    go run ./cmd/sampler -f=FORMAT -file=FILENAME
+    go run ./cmd/sampler -i=INGEST -f=FORMAT -file=FILENAME
 Options:
+    -i      The Ingest type (trace, metrics, logs, events, rum)
     -f      The request Data-Format (zipkin, otlp, sapm, jaegerthrift, sfx,...)
     -file   Output file name for payload data (default: payload.data)
 ```
@@ -105,13 +106,20 @@ Options:
 * Example for Jaeger Thrift data format over http:
 
 ```bash
- go run ./cmd/sampler -f="jaegerthrift" --file="payload.data"
+ go run ./cmd/sampler -i="trace" -f="jaegerthrift" -file="payload.data"
 ```
 than use curl to post http request with binary data:
 ```
 curl -X POST https://ingest.REALM.signalfx.com/v2/trace -H "Content-Type: application/x-thrift" -H "X-SF-Token: ACCESS_TOKEN" --data-binary @payload.data -i
 ```
 
+```bash
+ go run ./cmd/sampler -i="trace" -f="otlp" -file="trace_otlp.bin"
+```
+
+```
+curl -X POST https://ingest.lab0.signalfx.com/v2/trace/otlp -H "Content-Type: application/x-protobuf" -H "X-SF-Token: HlVmiiv5anAL-XFlP5GOEw" --data-binary @trace_otlp.bin -i
+```
 # Mock ingest services
 You can use a mock server to consume samples instead of the actual endpoint, however you won't be able to see the sent data in Splunk Observability suite.
 

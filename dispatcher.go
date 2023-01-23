@@ -25,34 +25,21 @@ type dispatcher struct {
 	commands map[string]func() int
 }
 
-func addCommand(commands map[string]func() int, cmd string, action func() int) {
-	commands[cmd] = action
-}
-
-func dispatchCommand(commands map[string]func() int, cmd string) int {
-	if f, ok := commands[cmd]; ok {
-		return f()
-	} else {
-		log.Printf("Unsupported command")
-		return 400
-	}
-}
-
 func setup(conf dispatcherConfig) *dispatcher {
 	d := &dispatcher{config: conf}
 	d.commands = make(map[string]func() int)
-	addCommand(d.commands, "logs", d.logsSample)
-	addCommand(d.commands, "metrics", d.metricsSample)
-	addCommand(d.commands, "trace", d.traceSample)
+	shared.AddCommand(d.commands, "logs", d.logsSample)
+	shared.AddCommand(d.commands, "metrics", d.metricsSample)
+	shared.AddCommand(d.commands, "trace", d.traceSample)
 	// TODO: implement samples for the following:
-	// addCommand(d.commands, "rum", d.rumSample)
-	// addCommand(d.commands, "events", d.eventsSample)
-	// addCommand(d.commands, "profiling", d.profilingSample)
+	// shared.AddCommand(d.commands, "rum", d.rumSample)
+	// shared.AddCommand(d.commands, "events", d.eventsSample)
+	// shared.AddCommand(d.commands, "profiling", d.profilingSample)
 	return d
 }
 
 func (d *dispatcher) dispatch() int {
-	return dispatchCommand(d.commands, d.config.ingest)
+	return shared.DispatchCommand(d.commands, d.config.ingest)
 }
 
 func unsupportedDataFormat(conf dispatcherConfig) string {
@@ -65,7 +52,7 @@ func (d *dispatcher) logsSample() int {
 	case "hec":
 		return d.httpHeclogs()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
@@ -84,7 +71,7 @@ func (d *dispatcher) httpMetricsSample() int {
 	case "otlp":
 		return d.httpOtlpMetrics()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
@@ -94,7 +81,7 @@ func (d *dispatcher) metricsSample() int {
 	case "http":
 		return d.httpMetricsSample()
 	default:
-		log.Printf(unsupportedDataFormat(d.config))
+		log.Print(unsupportedDataFormat(d.config))
 	}
 	return 400
 }
