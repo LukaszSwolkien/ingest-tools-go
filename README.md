@@ -113,6 +113,13 @@ than use curl to post http request with binary data:
 curl -X POST https://ingest.REALM.signalfx.com/v2/trace -H "Content-Type: application/x-thrift" -H "X-SF-Token: ACCESS_TOKEN" --data-binary @payload.data -i
 ```
 
+```bash
+ go run ./cmd/sampler -i="trace" -f="otlp" -file="trace_otlp.bin"
+```
+
+```
+curl -X POST https://ingest.lab0.signalfx.com/v2/trace/otlp -H "Content-Type: application/x-protobuf" -H "X-SF-Token: HlVmiiv5anAL-XFlP5GOEw" --data-binary @trace_otlp.bin -i
+```
 # Mock ingest services
 You can use a mock server to consume samples instead of the actual endpoint, however you won't be able to see the sent data in Splunk Observability suite.
 
