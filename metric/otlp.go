@@ -65,7 +65,7 @@ func getScopeMetrics(metrics *metric.Metric) []*metric.ScopeMetrics {
 	}
 }
 
-func getResourceMetric(metrics *metric.Metric) []*metric.ResourceMetrics {
+func GetResourceMetric(metrics *metric.Metric) []*metric.ResourceMetrics {
 	return []*metric.ResourceMetrics{
 		{
 			// Resource:     shared.GetResource("otlp-metric-generator"),
@@ -75,7 +75,7 @@ func getResourceMetric(metrics *metric.Metric) []*metric.ResourceMetrics {
 }
 
 func SendGrpcOtlpMetricSample(url string, secret string, grpcInsecure bool, metrics *metric.Metric) {
-	data := &metricSvc.ExportMetricsServiceRequest{ResourceMetrics: getResourceMetric(metrics)}
+	data := &metricSvc.ExportMetricsServiceRequest{ResourceMetrics: GetResourceMetric(metrics)}
 	conn, err := shared.GrpcConnection(url, grpcInsecure)
 	if err != nil {
 		log.Fatalf("Did not connect: %v", err)
@@ -101,7 +101,7 @@ func SendGrpcOtlpMetricSample(url string, secret string, grpcInsecure bool, metr
 
 func PostOtlpMetricSample(url string, secret string, metrics *metric.Metric) int {
 	// log.Printf("url: %v, secret: %v", url, secret)
-	d := &metricSvc.ExportMetricsServiceRequest{ResourceMetrics: getResourceMetric(metrics)}
+	d := &metricSvc.ExportMetricsServiceRequest{ResourceMetrics: GetResourceMetric(metrics)}
 
 	b, err := proto.Marshal(d)
 	if err != nil {

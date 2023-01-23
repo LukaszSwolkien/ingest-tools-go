@@ -8,13 +8,14 @@ import (
 
 	"reflect"
 
-	// "github.com/LukaszSwolkien/IngestTools/metric"
+	"github.com/LukaszSwolkien/IngestTools/metric"
 	"github.com/LukaszSwolkien/IngestTools/shared"
 	"github.com/LukaszSwolkien/IngestTools/trace"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/golang/protobuf/proto"
 
 	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1" // OTLP trace service
+	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1" // OTLP metrics service
 )
 
 var (
@@ -44,10 +45,29 @@ func dumpTraceSample() int {
 func dumpMetricsSample() int {
 	switch *format {
 	case "otlp":
+		return dumpMetricsOtlp()
 
 	default:
 		log.Printf("Unsupported data format `%v` for `%v` ingest", *format, *ingest)
 	}
+	return 0
+}
+
+func dumpMetricsOtlp() int {
+	otlp_metric := metric.GenerateOtlpMetric()
+	d := &metricSvc.ExportMetricsServiceRequest{ResourceMetrics: metric.GetResourceMetric(otlp_metric)}
+
+	b, err := proto.Marshal(d)
+	if err != nil {
+		log.Fatalf("Marshal: %v", err)
+		return 400
+	}
+	err = os.WriteFile(*fileName, b, 0666)
+	if err != nil {
+        log.Printf("Cannot write binary data to file: %v", err)
+		return 400
+    }
+
 	return 0
 }
 
