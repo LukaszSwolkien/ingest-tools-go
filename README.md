@@ -103,7 +103,7 @@ Options:
     -file   Output file name for payload data (default: payload.data)
 ```
 
-* Example for Jaeger Thrift data format over http:
+* Example for trace Jaeger Thrift data format over http:
 
 ```bash
  go run ./cmd/sampler -i="trace" -f="jaegerthrift" -file="payload.data"
@@ -113,12 +113,14 @@ than use curl to post http request with binary data:
 curl -X POST https://ingest.REALM.signalfx.com/v2/trace -H "Content-Type: application/x-thrift" -H "X-SF-Token: ACCESS_TOKEN" --data-binary @payload.data -i
 ```
 
+* Example for metrics OTLP protobuf data format over http:
+
 ```bash
- go run ./cmd/sampler -i="trace" -f="otlp" -file="trace_otlp.bin"
+ go run ./cmd/sampler -i="trace" -f="otlp" -file="metrics_otlp.bin"
 ```
 
 ```
-curl -X POST https://ingest.lab0.signalfx.com/v2/trace/otlp -H "Content-Type: application/x-protobuf" -H "X-SF-Token: HlVmiiv5anAL-XFlP5GOEw" --data-binary @trace_otlp.bin -i
+curl -X POST https://ingest.lab0.signalfx.com/v2/datapoint/otlp -H "Content-Type: application/x-protobuf" -H "X-SF-Token: ACCESS_TOKEN" --data-binary @metrics_otlp.bin -i
 ```
 # Mock ingest services
 You can use a mock server to consume samples instead of the actual endpoint, however you won't be able to see the sent data in Splunk Observability suite.
