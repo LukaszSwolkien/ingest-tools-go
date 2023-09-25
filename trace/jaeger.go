@@ -1,13 +1,14 @@
 package trace
 
 import (
+	"bytes"
 	"context"
-	jaegerThrift "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
-	"github.com/apache/thrift/lib/go/thrift"
 	"encoding/json"
 	"log"
-	"bytes"
-	"github.com/LukaszSwolkien/IngestTools/shared"
+
+	"github.com/LukaszSwolkien/ingest-tools/shared"
+	"github.com/apache/thrift/lib/go/thrift"
+	jaegerThrift "github.com/jaegertracing/jaeger/thrift-gen/jaeger"
 )
 
 const (
@@ -110,8 +111,9 @@ const (
 	}
 	`
 )
+
 func GenerateJeagerThriftSample() jaegerThrift.Batch {
-// test data copied from https://github.com/jaegertracing/jaeger/blob/master/model/converter/thrift/jaeger/fixtures/thrift_batch_01.json
+	// test data copied from https://github.com/jaegertracing/jaeger/blob/master/model/converter/thrift/jaeger/fixtures/thrift_batch_01.json
 
 	var batch jaegerThrift.Batch
 	json.Unmarshal([]byte(JaegerJSON), &batch)

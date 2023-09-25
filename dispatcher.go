@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	logevent "github.com/LukaszSwolkien/IngestTools/log"
-	"github.com/LukaszSwolkien/IngestTools/metric"
-	"github.com/LukaszSwolkien/IngestTools/shared"
-	"github.com/LukaszSwolkien/IngestTools/trace"
+	logevent "github.com/LukaszSwolkien/ingest-tools/log"
+	"github.com/LukaszSwolkien/ingest-tools/metric"
+	"github.com/LukaszSwolkien/ingest-tools/shared"
+	"github.com/LukaszSwolkien/ingest-tools/trace"
 )
 
 type dispatcherConfig struct {

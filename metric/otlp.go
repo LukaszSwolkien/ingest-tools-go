@@ -3,13 +3,14 @@ package metric
 import (
 	"bytes"
 	"context"
-	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1" // OTLP metrics service
-	common "go.opentelemetry.io/proto/otlp/common/v1"
-	metric "go.opentelemetry.io/proto/otlp/metrics/v1" // OTLP metrics data representation
 	"log"
 	"time"
 
-	"github.com/LukaszSwolkien/IngestTools/shared"
+	metricSvc "go.opentelemetry.io/proto/otlp/collector/metrics/v1" // OTLP metrics service
+	common "go.opentelemetry.io/proto/otlp/common/v1"
+	metric "go.opentelemetry.io/proto/otlp/metrics/v1" // OTLP metrics data representation
+
+	"github.com/LukaszSwolkien/ingest-tools/shared"
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"

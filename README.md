@@ -116,7 +116,7 @@ curl -X POST https://ingest.REALM.signalfx.com/v2/trace -H "Content-Type: applic
 * Example for metrics OTLP protobuf data format over http:
 
 ```bash
- go run ./cmd/sampler -i="trace" -f="otlp" -file="metrics_otlp.bin"
+ go run ./cmd/sampler -i="metrics" -f="otlp" -file="metrics_otlp.bin"
 ```
 
 ```

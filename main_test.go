@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/LukaszSwolkien/IngestTools/shared"
-	"github.com/LukaszSwolkien/IngestTools/ut"
+	"github.com/LukaszSwolkien/ingest-tools/shared"
+	"github.com/LukaszSwolkien/ingest-tools/ut"
 	yaml "gopkg.in/yaml.v3"
 )
 

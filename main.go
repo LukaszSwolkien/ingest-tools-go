@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/LukaszSwolkien/IngestTools/shared"
+	"github.com/LukaszSwolkien/ingest-tools/shared"
 )
 
 var (

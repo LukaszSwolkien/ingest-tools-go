@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	mock "github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
-	"github.com/LukaszSwolkien/IngestTools/cmd/mock/trace-server/server"
-	"github.com/LukaszSwolkien/IngestTools/ut"
+	mock "github.com/LukaszSwolkien/ingest-tools/cmd/mock/server"
+	"github.com/LukaszSwolkien/ingest-tools/cmd/mock/trace-server/server"
+	"github.com/LukaszSwolkien/ingest-tools/ut"
 )
 
 var (

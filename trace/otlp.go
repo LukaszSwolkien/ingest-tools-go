@@ -5,22 +5,22 @@ import (
 	"context"
 	"encoding/hex"
 	"log"
-	"math/rand"
 	"math/big"
+	"math/rand"
 	"time"
 
 	"google.golang.org/grpc"
 
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 
-	"github.com/LukaszSwolkien/IngestTools/shared"
+	"github.com/LukaszSwolkien/ingest-tools/shared"
 
 	"bytes"
 
 	//"github.com/golang/protobuf/proto"
-	"google.golang.org/protobuf/proto"
 	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1" // OTLP trace service
 	trace "go.opentelemetry.io/proto/otlp/trace/v1"              // OTLP traces data representation
+	"google.golang.org/protobuf/proto"
 )
 
 func randomHex(n int) string {
@@ -35,12 +35,10 @@ func newID() []byte {
 	return big.NewInt(r).FillBytes(b)
 }
 
-
 func GenerateOtlpSpan() *trace.Span {
 	now := uint64(time.Now().UnixNano())
 	traceID := append(newID(), newID()...)
 	spanID := traceID[:8]
-
 
 	start := now
 	return &trace.Span{
