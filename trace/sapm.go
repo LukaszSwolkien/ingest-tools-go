@@ -9,7 +9,8 @@ import (
 
 	"bytes"
 	"log"
-	"github.com/LukaszSwolkien/IngestTools/shared"
+
+	"github.com/LukaszSwolkien/ingest-tools/shared"
 )
 
 func GenerateSapmSpan() *model.Batch {

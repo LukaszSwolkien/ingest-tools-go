@@ -1,4 +1,4 @@
-module github.com/LukaszSwolkien/IngestTools
+module github.com/LukaszSwolkien/ingest-tools
 
 go 1.19
 

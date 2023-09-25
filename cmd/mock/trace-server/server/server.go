@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"log"
 	"net"
+
 	// status "google.golang.org/grpc/status"
 	// codes "google.golang.org/grpc/codes"
 	colTrace "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 
-	"github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"os/signal"
 	"syscall"
+
+	"github.com/LukaszSwolkien/ingest-tools/cmd/mock/server"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type Server struct {

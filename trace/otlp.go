@@ -3,7 +3,9 @@ package trace
 
 import (
 	"context"
+	"encoding/hex"
 	"log"
+	"math/big"
 	"math/rand"
 	"time"
 
@@ -11,17 +13,32 @@ import (
 
 	grpcSfxAuth "github.com/signalfx/ingest-protocols/grpc"
 
-	"github.com/LukaszSwolkien/IngestTools/shared"
+	"github.com/LukaszSwolkien/ingest-tools/shared"
 
 	"bytes"
 
-	"github.com/golang/protobuf/proto"
+	//"github.com/golang/protobuf/proto"
 	traceSvc "go.opentelemetry.io/proto/otlp/collector/trace/v1" // OTLP trace service
 	trace "go.opentelemetry.io/proto/otlp/trace/v1"              // OTLP traces data representation
+	"google.golang.org/protobuf/proto"
 )
+
+func randomHex(n int) string {
+	bytes := make([]byte, n)
+	_, _ = rand.Read(bytes)
+	return hex.EncodeToString(bytes)
+}
+
+func newID() []byte {
+	r := rand.Int63()
+	b := make([]byte, 8)
+	return big.NewInt(r).FillBytes(b)
+}
 
 func GenerateOtlpSpan() *trace.Span {
 	now := uint64(time.Now().UnixNano())
+	traceID := append(newID(), newID()...)
+	spanID := traceID[:8]
 
 	start := now
 	return &trace.Span{
@@ -33,8 +50,8 @@ func GenerateOtlpSpan() *trace.Span {
 		ParentSpanId:      nil,                                      // Parent's Span identifier
 		Links:             []*trace.Span_Link{},                     // Links to zero or more causally-related Spans (via the SpanContext to those related Spans)
 		// SpanContext. All the info that identifies Span in the Trace.
-		TraceId:                []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		SpanId:                 []byte{0, 0, 0, 0, 0, 0, 0, 2},
+		TraceId:                traceID, //[]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		SpanId:                 spanID,
 		TraceState:             "",
 		Kind:                   trace.Span_SPAN_KIND_CLIENT,
 		DroppedAttributesCount: 0,

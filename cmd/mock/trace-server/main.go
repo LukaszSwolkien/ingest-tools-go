@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	core "github.com/LukaszSwolkien/IngestTools/cmd/mock/server"
-	"github.com/LukaszSwolkien/IngestTools/cmd/mock/trace-server/server"
+
+	core "github.com/LukaszSwolkien/ingest-tools/cmd/mock/server"
+	"github.com/LukaszSwolkien/ingest-tools/cmd/mock/trace-server/server"
 )
 
 var (
