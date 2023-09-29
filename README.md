@@ -142,3 +142,23 @@ To run unit tests and check test coverage run below script
 ```bash
 ./test_cover.sh
 ```
+
+# Build container and run gRPC mock server
+
+Build your image
+
+```bash
+docker build -t ingest-tools:1.0 .
+```
+
+Create and start container with mock server
+
+```bash
+docker run --name otlp-grpc-server -d -p 8201:8201 ingest-tools:0.1
+```
+
+Stop mock server
+
+```bash
+ docker stop otlp-grpc-server
+```
